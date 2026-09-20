@@ -110,3 +110,31 @@ The store emits NBSP and zero-width joiners inside its prices, so those characte
 legitimately belong in our patterns — as `\u00A0` and `\u200B` escapes. A literal zero-width
 space in a regex is invisible in a diff, survives a copy-paste, and is impossible to review.
 `no-irregular-whitespace` is on so it stays that way.
+
+## Phase 4 — Live infrastructure
+
+**D21 · Search keeps a trigram threshold of 0.25, and the guarantee is ranking rather than
+exclusion.** Measured against the real 1,000-row catalogue: genuine typos score 0.412
+(`slimbok`), 0.381 (`hedphones`, `turntabl`), 0.350 (`nordkaft`), 0.318 (`keybord`) and 0.263
+(`sneakr`); nonsense scores 0.261 (`xylophone`), 0.097 (`refrigerator`, `passport`), 0.074,
+0.042, 0.033. The two classes overlap at the boundary — `xylophone` shares trigrams with
+`microphone` — so no threshold separates them, and picking 0.262 would be overfitting to two
+samples. Exact and substring matches score 0.85–0.95 and always sort above fuzzy ones, so a
+weak match can appear but can never displace a good one. The test now asserts that ordering
+rather than claiming a nonsense query returns nothing, which was only true of the three-row
+fixture it ran against.
+
+**D22 · Supabase in ap-southeast-1, not ap-south-1.** The backend↔database round trips (read
+last price, write log, write history) happen several times per product per cycle, so
+colocating Supabase with Render matters more than being near the store. `render.yaml` pins
+Render to Singapore, so Supabase matches it.
+
+**D23 · The catalogue was seeded through one generated query rather than 1,000 literals.**
+A full harvest of the live store showed the catalogue is formulaic — brand cycles every 14
+ids, category every 8, product type within the category, suffix every 80 — and the formula
+reproduces all 1,000 names, brands and categories exactly. `slug`, `sku`, `url` and
+`description` are derivable too (`sku = brand[0:3] + '-' + (10000 + id)`; the first attempt got
+that wrong for the 100 ids under 100 and the check caught it). Seeding is normally
+`npm run seed:catalog`, which upserts the real fetched values; the generated query exists
+because the service-role key was not available and it had to go through the SQL connector.
+Every derivation was verified against the harvest before it was trusted.

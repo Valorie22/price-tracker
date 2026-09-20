@@ -16,8 +16,13 @@
  *
  * Idempotent: re-running refreshes `last_seen_at` and picks up anything new.
  *
- *   npm run seed:catalog -w backend           # full index
+ *   npm run seed:catalog -w backend                    # full index
  *   npm run seed:catalog -w backend -- --max-draws 40
+ *   npm run seed:catalog -w backend -- --dump catalog.json   # harvest only, no database
+ *
+ * `--dump` writes the harvested rows to a file instead of upserting them. Useful when the
+ * database is not reachable from where you are standing, and for inspecting exactly what
+ * the store returned before trusting it.
  */
 import { env } from '../src/lib/env.js';
 import { createLogger, setPretty } from '../src/lib/logger.js';
@@ -27,6 +32,14 @@ import { closeFetcher } from '../src/scraper/fetcher.js';
 
 setPretty(true);
 const log = createLogger({ script: 'seed-catalog' });
+
+function flagStr(name: string): string | null {
+  const withEq = process.argv.find((a) => a.startsWith(`--${name}=`));
+  if (withEq) return withEq.slice(name.length + 3);
+  const i = process.argv.indexOf(`--${name}`);
+  const next = process.argv[i + 1];
+  return i >= 0 && next && !next.startsWith('--') ? next : null;
+}
 
 function arg(name: string, fallback: number): number {
   const i = process.argv.indexOf(`--${name}`);
@@ -115,6 +128,15 @@ async function main(): Promise<void> {
 
   // --- write ----------------------------------------------------------------
   const rows = [...collected.values()].map(toRow);
+
+  const dumpPath = flagStr('dump');
+  if (dumpPath) {
+    const fs = await import('node:fs');
+    fs.writeFileSync(dumpPath, JSON.stringify(rows, null, 1));
+    log.info('dumped instead of writing', { path: dumpPath, rows: rows.length, storeTotal: total || 'unknown' });
+    return;
+  }
+
   log.info('writing to the database', { rows: rows.length });
 
   const BATCH = 250;

@@ -253,9 +253,23 @@ describe('search_products', () => {
     expect(res.rows.map((r) => r.name)).toContain('Helix Turntable Lite');
   });
 
-  it('returns nothing rather than guessing for an unrelated query', async () => {
-    const res = await db.query(`select name from search_products('xylophone', 10)`);
-    expect(res.rows).toEqual([]);
+  it('ranks an exact match above a fuzzy one', async () => {
+    // What actually matters is the ordering, not whether a weak match appears at all.
+    // Measured against the real 1,000-row catalogue, trigram similarity cannot separate
+    // a genuine typo from nonsense: "sneakr" scores 0.263 against "Vista Sneaker XL" and
+    // "xylophone" scores 0.261 against "Domus Microphone X". Any threshold that drops the
+    // second drops the first. So the guarantee this function offers is ranking, not
+    // exclusion — see DECISIONS.md D21.
+    const res = await db.query<{ name: string; score: number }>(
+      `select name, score from search_products('turntable', 10)`,
+    );
+    expect(res.rows[0]?.name).toBe('Helix Turntable Lite');
+    expect(Number(res.rows[0]?.score)).toBeGreaterThan(0.8);
+  });
+
+  it('does not let a nonsense query score like a real one', async () => {
+    const junk = await db.query<{ score: number }>(`select score from search_products('qwertyuiop', 10)`);
+    for (const row of junk.rows) expect(Number(row.score)).toBeLessThan(0.3);
   });
 });
 
