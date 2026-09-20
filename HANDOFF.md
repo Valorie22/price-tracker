@@ -70,12 +70,12 @@ git branch -M main
 git push -u origin main
 ```
 
-CI (`.github/workflows/ci.yml`) runs on that push: typecheck, lint, 98 tests, build. It needs
+CI (`.github/workflows/ci.yml`) runs on that push: typecheck, lint, 103 tests, build. It needs
 no secrets — the tests run entirely offline.
 
 ---
 
-## 2 · Supabase — DONE, except one key
+## 2 · Supabase — DONE
 
 The project already exists and the schema is applied and verified:
 
@@ -99,17 +99,14 @@ design: no policies means the publishable key can read and write nothing.
 > it. Fixed, and written up in `AI_ERRORS.md` §8. `db/schema.sql` now produces the hardened
 > state from scratch, and `backend/tests/schema.test.ts` asserts it.
 
-### The one thing left: the service-role key
+The `service_role` key is in `backend/.env` (gitignored) along with the URL and the cron
+secret, and the full pipeline has been run against it — see §6.
 
-The Supabase connector deliberately does not expose service-role keys, so this one is copied
-by hand — once:
-
-1. Open **https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev/settings/api-keys**
-2. Reveal **`service_role`** and copy it
-3. Paste it into `backend/.env` on the `SUPABASE_SERVICE_ROLE_KEY=` line (already created,
-   gitignored, with the URL and cron secret filled in)
-
-That key bypasses RLS. Server only — never in a browser, never committed.
+**Rotate that key before or shortly after submitting.** It bypasses RLS entirely and it was
+pasted into a chat to get it here, so treat it as exposed:
+https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev/settings/api-keys → roll
+`service_role`, then update `backend/.env` and Render's environment. Nothing else needs to
+change. It is server-only — never in a browser, never committed.
 
 ### Applying the schema elsewhere
 
@@ -172,24 +169,18 @@ Expected — note `database` must say `reachable`:
 If it says `unreachable`, the Supabase values are wrong. If it says `not configured`, they
 were not saved. Both are visible in the Render log line printed at boot.
 
-### Seed the catalogue index
+### Seed the catalogue index — already done
 
-The store has no search endpoint and `/api/catalog` returns a random sample on every call, so
-partial-name search only works against a copy we hold (STORE_NOTES.md §3). Run this once,
-from your machine, against the live Supabase:
+All 1,000 products are indexed and search is verified against them (`slimbook` returns 12
+ranked hits). Nothing to do. To rebuild or refresh it later:
 
 ```bash
-cp .env.example backend/.env       # then paste the Supabase values into it
-npm ci
 npm run seed:catalog -w backend
 ```
 
-Takes about two minutes for all 1,000 products, paced at the measured-safe request rate. It
-prints its coverage at the end:
-
-```
-INFO  done  indexed=1000 distinctIds=1000 storeTotal=1000 coverage=100.0% draws=137
-```
+About two minutes, paced at the measured-safe request rate, and idempotent. The store has no
+search endpoint and `/api/catalog` returns a random sample on every call, which is why this
+index has to exist at all — STORE_NOTES.md §3.
 
 ---
 
@@ -462,13 +453,13 @@ Run these yourself to reproduce; they need no accounts.
 
 ```bash
 npm ci
-npm test                    # 98 tests
+npm test                    # 103 tests
 npm run build
 ```
 
 ```
  Test Files  5 passed (5)
-      Tests  98 passed (98)
+      Tests  103 passed (103)
 ```
 
 The suite is offline: extraction runs against real store responses captured into

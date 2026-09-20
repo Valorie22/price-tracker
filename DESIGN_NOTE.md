@@ -241,7 +241,7 @@ know which code path can actually produce the failure it defends against.
 
 **6 · The build emitted to a path the deploy config did not point at.** `tsconfig.json` had
 `rootDir: "."` and included `scripts` and `tests`, so the compiler produced
-`dist/src/index.js` while `render.yaml` started `dist/index.js`. Typecheck passed, 98 tests
+`dist/src/index.js` while `render.yaml` started `dist/index.js`. Typecheck passed, every test
 passed, the build "succeeded", and the deployment would have crash-looped on boot with a
 module-not-found. Caught by running the built artefact. *Correction:* a separate
 `tsconfig.build.json` that compiles `src` alone. *What it changed:* every verification step in

@@ -294,7 +294,7 @@ Requires Chromium: `npx playwright install chromium`.
 ## Tests
 
 ```bash
-npm test                    # 98 tests, entirely offline
+npm test                    # 103 tests, entirely offline
 npx vitest --root backend   # watch mode
 ```
 
@@ -340,7 +340,7 @@ backend/
     headed-run.ts            the observable run
     seed-catalog.ts          builds the searchable catalogue index
     smoke.ts                 one-shot strategy check against the live store
-  tests/                     98 tests against captured fixtures + pglite
+  tests/                     103 tests against captured fixtures + pglite
 frontend/
   src/
     components/StripChart.tsx  the hero graphic
