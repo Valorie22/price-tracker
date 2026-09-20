@@ -89,6 +89,8 @@ export const apiStrategy: Strategy = {
         stockQuantity: quote.stockQuantity,
         stockRaw: `quantity=${quote.stockQuantity}`,
         mrp: quote.mrp,
+        // price and mrp arrive in one decrypted payload — they cannot be mismatched.
+        atomic: true,
         pending: quote.pending,
         identity: product
           ? { name: product.name, slug: product.slug, sku: product.sku, id: String(product.id) }

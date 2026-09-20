@@ -106,3 +106,34 @@ named `STORE_INTERNAL_RETRIES` with a comment saying where the number comes from
 tunes it by trial and error again.
 **Lesson:** when you inject a fault into a system that already retries, you are not testing
 your retry logic until you have exhausted theirs.
+
+### 5 · A guardrail that would have rejected correct data
+
+**When:** first run of the validation test suite.
+**What happened:** two tests failed with "expected 'failed' to be 'success'". The reading
+was clean — right product, right currency, a 28% move well inside the delta threshold — and
+the engine threw it away. The culprit was a rule I had written into `validate.ts` without
+thinking about where its inputs come from:
+
+```
+if (reading.mrp != null && reading.price > reading.mrp * 1.02) reject(...)
+```
+
+The intent was sound: the store's price block holds five numbers — two hidden decoys, a
+struck-through MRP, a "Deal price" line and the real figure — and a selector that drifts one
+element comes back with them inverted. A price above its own list price is the signature of
+that mistake.
+
+But the API strategy reads price and MRP out of **one decrypted payload**. They cannot be
+mismatched, so the rule has nothing to catch there — while a genuine price rise past a stale
+list price would silently stop the tracker from ever recording anything again. A guardrail
+that can only produce false negatives on its most-used path is worse than no guardrail.
+
+**Correction:** `CandidateReading` now carries `atomic`. The API strategy sets it and the
+check is skipped; anything reading a rendered page does not, and the check applies in full.
+Both branches are now tested explicitly.
+
+**Lesson that shaped the build:** a validation rule needs to know which failure it is
+defending against and which code path can actually produce that failure. Applied
+indiscriminately, the same rule that catches a parsing error becomes a source of silent
+data loss.

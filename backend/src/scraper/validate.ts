@@ -19,6 +19,13 @@ export interface CandidateReading {
   /** The exact wording the store used for stock, if we read it from text. */
   stockRaw?: string;
   mrp?: number | null;
+  /**
+   * True when `price` and `mrp` came out of one atomic payload rather than two
+   * separate elements. The API strategy sets it; anything reading a rendered page
+   * does not, because picking two numbers out of a block that contains five of them
+   * is exactly where an inverted read happens.
+   */
+  atomic?: boolean;
   /** The store's own "this figure is not final" flag, when the strategy can see it. */
   pending?: boolean;
   /** Name/slug/sku the page claimed, for the identity check. */
@@ -86,9 +93,28 @@ export function validateReading(reading: CandidateReading, ctx: ValidationContex
     return reject('VALIDATION_REJECT', `Unrecognised currency "${reading.currency}"`);
   }
 
-  // 4. MRP sanity: a sale price above its own list price means we read two different numbers.
-  if (reading.mrp != null && Number.isFinite(reading.mrp) && reading.mrp > 0 && reading.price > reading.mrp * 1.02) {
-    return reject('VALIDATION_REJECT', `Price ${reading.price} exceeds MRP ${reading.mrp}; the two figures did not come from the same product`);
+  // 4. MRP sanity, for readings assembled from a page.
+  //
+  //    The store's price block holds five numbers: two hidden decoys, a struck-through
+  //    MRP, a "Deal price" line and the real figure. A selector that drifts one element
+  //    can come back with the MRP as the price and something smaller as the MRP — an
+  //    inverted read that looks entirely plausible on its own. A price above its own
+  //    list price is the signature of that mistake.
+  //
+  //    Skipped when the two figures came out of one payload: the store is the authority
+  //    on its own numbers, and a genuine price rise past an old MRP is the store's
+  //    business, not a parsing error.
+  if (
+    !reading.atomic &&
+    reading.mrp != null &&
+    Number.isFinite(reading.mrp) &&
+    reading.mrp > 0 &&
+    reading.price > reading.mrp * 1.02
+  ) {
+    return reject(
+      'VALIDATION_REJECT',
+      `Price ${reading.price} exceeds the list price ${reading.mrp} on the same page; the two figures did not come from where we think they did`,
+    );
   }
 
   // 5. Identity: are we still reading the product we think we are tracking?
