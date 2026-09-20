@@ -138,3 +138,44 @@ that wrong for the 100 ids under 100 and the check caught it). Seeding is normal
 `npm run seed:catalog`, which upserts the real fetched values; the generated query exists
 because the service-role key was not available and it had to go through the SQL connector.
 Every derivation was verified against the harvest before it was trusted.
+
+### Render: created the service from the API rather than the blueprint
+
+The Render connector exposes `create_web_service`, not "apply this `render.yaml`". Creating
+the service from the API sets every field non-interactively — all 17 environment variables
+included — where the blueprint route needs a human in the dashboard to answer the four
+`sync: false` prompts. `render.yaml` stays in the repository as the reproducible definition
+and is what the README documents; the live service was built to match it field for field.
+
+Two consequences, both accepted deliberately:
+
+- `healthCheckPath` is not a parameter the API accepts, so the live service has none. On the
+  free plan there are no zero-downtime deploys for it to gate, so it costs nothing but a
+  dashboard checkbox if it is ever wanted.
+- The live service's build command cannot be edited through the connector, so the
+  `--include=dev` fix of AI_ERRORS.md §9 went in as `NPM_CONFIG_INCLUDE=dev` instead. The
+  repository and the running service reach the same state by different levers, which is
+  recorded here so the difference is not mistaken for drift.
+
+### Vercel: `ssoProtection` disabled explicitly on project creation
+
+A new Vercel project defaults to `ssoProtection.deploymentType = "all_except_custom_domains"`,
+which puts every `*.vercel.app` URL behind a Vercel login. The submitted link has to open for
+a grader who has no Vercel account, so it was turned off at creation. Worth naming because it
+is a silent default: the deploy succeeds, the URL resolves, and it still fails for everyone
+but the owner.
+
+### Vercel: project created with `create_project`, not `create_git_project`
+
+`create_git_project` is the connector's intended path, but it requires an explicit `teamId`
+and this account's token 403s on every call that names one:
+
+```
+Not authorized: Trying to access resource under scope "valories-projects-20c9e1bb".
+```
+
+The same calls succeed with `teamId` omitted, where the token resolves its own scope.
+`create_project` makes `teamId` optional and takes `gitRepository` and `environmentVariables`
+in the same call, so it reaches the identical end state — a GitHub-linked project with
+`VITE_API_BASE_URL` already set — without ever naming the scope that breaks.
+

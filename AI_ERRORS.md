@@ -270,3 +270,48 @@ that holds in the test environment can be absent in production — `anon`, `auth
 running the advisor against the real project. And in a permission system, *absence of a
 visible grant is not absence of a grant*. A NULL ACL and a locked-down ACL look equally empty
 and mean opposite things.
+
+---
+
+### 9 · Shipped a `render.yaml` whose build command could never have worked
+
+**When:** the first Render deploy, minutes after the repository was finally pushed.
+**What I assumed:** `render.yaml` had been written in Phase 4 and reviewed twice, and
+`npm ci && npm run build -w backend` is the same command that passes locally and in CI. I
+treated it as verified because the *string* was correct.
+**What actually happened:** the build failed 18 seconds in.
+
+```
+==> Running build command 'npm ci && npm run build -w backend'...
+added 131 packages, and audited 134 packages in 2s
+> backend@1.0.0 build
+> tsc -p tsconfig.build.json
+error TS2688: Cannot find type definition file for 'node'.
+  The file is in the program because:
+    Entry point of type library 'node' specified in compilerOptions
+npm error Lifecycle script `build` failed with error: code 2
+==> Build failed 😞
+```
+
+`131 packages` is the tell. Locally the same install brings in an order of magnitude more.
+`render.yaml` itself sets `NODE_ENV=production`, and under that value `npm ci` omits
+`devDependencies` — where this project keeps `typescript`, `@types/node`, `tsx`, `vitest` and
+`playwright`. The build command asked `tsc` to run in a tree that deliberately had no `tsc`
+and no Node type definitions in it.
+
+**Correction:** `npm ci --include=dev && npm run build -w backend`. `include` beats the
+`omit` that `NODE_ENV` implies regardless of ordering, so it is the right lever rather than
+deleting `NODE_ENV=production`, which the app reads at runtime. The running service was
+already created from the API, where the build command is not editable through the connector,
+so it was fixed there with `NPM_CONFIG_INCLUDE=dev` — npm reads `NPM_CONFIG_*` as config, and
+it reaches the same state from the environment side.
+
+**What it changed:** `render.yaml`, and the live service's environment.
+
+**Lesson that shaped the build:** a deploy config is not verified by reading it, only by
+running it — the same rule BUILD_SPEC.md §0.4 sets for every other phase, which I had quietly
+exempted the deployment files from because they were "just YAML". Nothing local could have
+caught this: the failure needs `NODE_ENV=production` at install time, and no local run, no
+test and no CI job sets it. This is the second deploy-config error in this log (§6 was the
+build output path) and both have the same shape — a file that describes an environment I had
+not yet executed in.

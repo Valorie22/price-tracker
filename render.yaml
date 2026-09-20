@@ -17,9 +17,13 @@ services:
     region: singapore # closest to the store and to Supabase ap-south-1
     branch: main
 
-    buildCommand: npm ci && npm run build -w backend
+    # `--include=dev` is load-bearing: Render sets NODE_ENV=production, under which
+    # `npm ci` omits devDependencies — and `typescript` and `@types/node` live there.
+    # Without it the build dies on `error TS2688: Cannot find type definition file for
+    # 'node'`. AI_ERRORS.md §9.
+    buildCommand: npm ci --include=dev && npm run build -w backend
     # With the browser fallback:
-    # buildCommand: npm ci && npx playwright install --with-deps chromium && npm run build -w backend
+    # buildCommand: npm ci --include=dev && npx playwright install --with-deps chromium && npm run build -w backend
 
     startCommand: node backend/dist/index.js
 
