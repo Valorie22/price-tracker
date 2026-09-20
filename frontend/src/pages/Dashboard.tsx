@@ -89,10 +89,11 @@ export function Dashboard({ onOpenPalette }: { onOpenPalette: () => void }): JSX
         <>
         <RunHealth rows={rows} />
 
-        {/* Below md the table becomes a list of cards. A table that scrolls sideways on a
-            phone hides exactly the columns that matter most here — the outcome and the
-            delta live at the right-hand end. */}
-        <ul className="space-y-2 md:hidden">
+        {/* Below lg the table becomes a list of cards. Eight columns need about 900px to
+            breathe, and a table that scrolls sideways hides exactly the columns that matter
+            most here — the outcome and the deltas live at the right-hand end. Between lg and
+            xl the two least load-bearing columns drop out instead. */}
+        <ul className="space-y-2 lg:hidden">
           {rows.map((row) => (
             <li key={row.tracked_id}>
               <Card row={row} />
@@ -100,8 +101,8 @@ export function Dashboard({ onOpenPalette }: { onOpenPalette: () => void }): JSX
           ))}
         </ul>
 
-        <div className="panel hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[720px] border-collapse text-left">
+        <div className="panel hidden overflow-x-auto lg:block">
+          <table className="w-full min-w-[640px] border-collapse text-left">
             <thead>
               <tr className="border-b border-rule">
                 <Th sort={sort} setSort={setSort} col="name" className="w-[30%]">
@@ -116,7 +117,7 @@ export function Dashboard({ onOpenPalette }: { onOpenPalette: () => void }): JSX
                 <Th sort={sort} setSort={setSort} col="delta7" align="right">
                   7d
                 </Th>
-                <th className="px-3 py-2">
+                <th className="hidden px-3 py-2 xl:table-cell">
                   <span className="label">7-day trace</span>
                 </th>
                 <th className="px-3 py-2">
@@ -125,7 +126,7 @@ export function Dashboard({ onOpenPalette }: { onOpenPalette: () => void }): JSX
                 <Th sort={sort} setSort={setSort} col="lastScrape">
                   Last scrape
                 </Th>
-                <th className="px-3 py-2">
+                <th className="hidden px-3 py-2 xl:table-cell">
                   <span className="label">Next</span>
                 </th>
               </tr>
@@ -178,7 +179,7 @@ function Row({ row }: { row: TrackedRow }): JSX.Element {
         <DeltaBadge value={d7} />
       </td>
 
-      <td className="px-3 py-2.5">
+      <td className="hidden px-3 py-2.5 xl:table-cell">
         <Sparkline points={row.sparkline} intervalMinutes={row.scrape_interval_minutes} />
       </td>
 
@@ -198,7 +199,7 @@ function Row({ row }: { row: TrackedRow }): JSX.Element {
         )}
       </td>
 
-      <td className="px-3 py-2.5">
+      <td className="hidden px-3 py-2.5 xl:table-cell">
         <span className="font-mono text-sm text-muted">{row.is_active ? (next ?? 'due') : '—'}</span>
         <span className="mt-0.5 block text-xs text-muted">{intervalLabel(row.scrape_interval_minutes)}</span>
       </td>
