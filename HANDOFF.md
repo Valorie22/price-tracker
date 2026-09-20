@@ -78,6 +78,25 @@ no secrets — the tests run entirely offline.
 1. [supabase.com](https://supabase.com) → **New project**. Region **ap-south-1 (Mumbai)** if
    offered; it is closest to both the store and the Render region in `render.yaml`.
 2. Wait for provisioning (~2 min).
+
+### Then, one command
+
+Generate a personal access token at
+[supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) and:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_xxx npm run db:apply -w backend -- --print-env
+```
+
+That applies `db/schema.sql`, **verifies** the result — eight tables, the `tracked_overview`
+view, all three functions, and RLS on every table — and prints the two environment variables
+you need for §3. If the account has more than one project it stops and lists them rather than
+guessing.
+
+The token is read from the environment, used, and never written anywhere.
+
+### Or by hand
+
 3. **SQL Editor → New query** → paste the whole of `db/schema.sql` → **Run**.
    It is idempotent, so re-running is safe. Expect `Success. No rows returned`.
 4. **Project Settings → Data API** → copy the **Project URL**.

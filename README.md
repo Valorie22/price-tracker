@@ -90,8 +90,17 @@ Node 22+, npm 10+, a Supabase project, a Render account, a Vercel account.
 
 ### 1 · Database
 
-Supabase → **SQL Editor** → **New query** → paste all of
-[`db/schema.sql`](db/schema.sql) → **Run**. It is idempotent, so re-running is safe.
+Either paste [`db/schema.sql`](db/schema.sql) into Supabase → **SQL Editor** → **Run**, or —
+with a [personal access token](https://supabase.com/dashboard/account/tokens) — let the
+script do it and verify the result:
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_xxx npm run db:apply -w backend -- --print-env
+```
+
+It applies the schema, checks that all eight tables, the view, the three functions and RLS
+are actually in place, and prints the two environment variables the backend needs. Either
+route is idempotent, so re-running is safe.
 
 That creates eight tables, the `tracked_overview` view the dashboard reads, the
 `search_products` ranking function, and the two advisory-lock functions. Row Level Security

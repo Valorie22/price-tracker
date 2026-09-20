@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "scrape:headed": "tsx scripts/headed-run.ts",
-    "seed:catalog": "tsx scripts/seed-catalog.ts"
+    "seed:catalog": "tsx scripts/seed-catalog.ts",
+    "db:apply": "tsx scripts/apply-schema.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

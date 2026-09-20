@@ -2,9 +2,14 @@
   "name": "ine-price-tracker",
   "private": true,
   "version": "1.0.0",
-  "description": "Product price tracker for the INE mock storefront — reliable scheduled scraping, honest logging, live price history.",
-  "workspaces": ["backend", "frontend"],
-  "engines": { "node": ">=20" },
+  "description": "Product price tracker for the INE mock storefront \u2014 reliable scheduled scraping, honest logging, live price history.",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "npm run dev -w backend & npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
@@ -14,6 +19,7 @@
     "lint": "npm run lint -w backend && npm run lint -w frontend",
     "test": "npm run test -w backend",
     "scrape:headed": "npm run scrape:headed -w backend",
-    "seed:catalog": "npm run seed:catalog -w backend"
+    "seed:catalog": "npm run seed:catalog -w backend",
+    "db:apply": "npm run db:apply -w backend"
   }
 }
