@@ -90,22 +90,27 @@ export async function closeBrowser(): Promise<void> {
  * broken, and everything downstream — the retry, the backoff, the recovery, the log
  * rows — is the production code path, not a rehearsal.
  *
- * The counts are chosen against a fact read out of the store's own bundle: its
- * front-end retries the quote six times internally before it gives up and renders
- * "Couldn't load the price after 6 attempts". A smaller number of failures is
- * absorbed silently by the page and our engine never sees a problem, so the fault
- * plan spends exactly that budget and then stops — which pushes the page into its
- * visible error state and makes our retry and backoff the thing that recovers it.
- *
- *   slow   hold the first quote request 9 s — the page sits on "Loading current price…"
+ *   slow   hold the quote request 9 s — the page sits on "Loading current price…"
  *   late   hold it 4 s — the price lands well after the rest of the page
- *   error  answer 503 six times, then let the real request through
+ *   error  answer 503 until the page gives up, then let the real request through
  *   all    the 503 run, then a slow response, then recovery — the full narrative
  *
- * The order of `all` is not cosmetic. A slow response is not a *failed* response: the page
- * simply waits it out and succeeds on its first internal attempt, consuming the delay and
- * leaving the 503s untouched. Putting the failures first makes attempt 1 fail for real, and
- * the 9-second hold then lands on attempt 2 as the wait before the recovery.
+ * TWO THINGS THAT LOOK ARBITRARY AND ARE NOT
+ *
+ * **The fault plan is scoped to an engine attempt, not to a page or to the session.**
+ * Each attempt opens a fresh page, and the plan has been all three at different points.
+ * Page scope re-armed the whole plan every attempt, so the run could never recover — four
+ * attempts, four failures, nothing to show. Session scope recovered, but the failures
+ * leaked across attempt boundaries in a way that varied with timing: one run took two
+ * attempts and the next took four, which is a coin toss to build a recording around.
+ * Attempt scope makes the narrative deterministic — attempt 1 fails, attempt 2 recovers —
+ * and that determinism is the whole reason the flag exists.
+ *
+ * **The failure count is the store's own retry budget.** Its front-end retries a failed
+ * quote six times before it gives up and renders "Couldn't load the price after 6 attempts".
+ * Serve fewer and the page absorbs them silently; our engine sees a perfectly good price and
+ * there is no failure to demonstrate (AI_ERRORS.md §4). A margin is added because the page
+ * does not always spend the whole budget before our condition observes its error state.
  */
 interface SimulationStep {
   kind: 'delay' | 'fail';
@@ -113,48 +118,38 @@ interface SimulationStep {
   status?: number;
 }
 
-/**
- * The store's front-end retries a failed quote six times before it gives up and
- * renders "Couldn't load the price after 6 attempts". Anything short of that is
- * absorbed silently and our engine never learns a thing — see AI_ERRORS.md §4.
- */
 const STORE_INTERNAL_RETRIES = 6;
 
-function planFor(mode: SimulationMode): SimulationStep[] {
-  const fail = (n: number): SimulationStep[] => Array.from({ length: n }, () => ({ kind: 'fail' as const, status: 503 }));
-  switch (mode) {
-    case 'slow': return [{ kind: 'delay', ms: 9_000 }];
-    case 'late': return [{ kind: 'delay', ms: 4_000 }];
-    case 'error': return fail(STORE_INTERNAL_RETRIES);
-    case 'all': return [...fail(STORE_INTERNAL_RETRIES), { kind: 'delay', ms: 9_000 }];
-  }
-}
+/** What this engine attempt should meet. Attempts past the second always meet a healthy store. */
+function planForAttempt(mode: SimulationMode, attempt: number): SimulationStep[] {
+  const fail = (n: number): SimulationStep[] =>
+    Array.from({ length: n }, () => ({ kind: 'fail' as const, status: 503 }));
 
-/**
- * Simulation state lives at session scope, not page scope.
- *
- * Each engine attempt opens a fresh page. When the counter lived on the page, every
- * attempt re-armed the full fault plan and the run could never recover — four
- * attempts, four failures, nothing to show. At session scope the plan is spent once
- * and the next attempt meets a healthy store, which is the recovery the recording
- * is supposed to capture.
- */
-let simulationStep = 0;
-export function resetSimulation(): void {
-  simulationStep = 0;
+  if (attempt === 1) {
+    switch (mode) {
+      case 'slow': return [{ kind: 'delay', ms: 9_000 }];
+      case 'late': return [{ kind: 'delay', ms: 4_000 }];
+      case 'error':
+      case 'all': return fail(STORE_INTERNAL_RETRIES + 2);
+    }
+  }
+  // The second attempt of `all` is the slow one: a wait, and then the real price.
+  if (attempt === 2 && mode === 'all') return [{ kind: 'delay', ms: 9_000 }];
+  return [];
 }
 
 /**
  * Route every store request Chromium makes through the same pacer the HTTP client
- * uses, and apply the fault plan on the way past.
+ * uses, and apply this attempt's fault plan on the way past.
  *
- * Both halves matter. The pacing is not optional: one "Reveal price" click can be
- * eighteen requests once the store's own retry loop gets going, and unpaced that
- * rate-limits the whole engine — including the API strategy, which was behaving
- * perfectly (AI_ERRORS.md §3). Assets are left alone; only `/api/*` is metered.
+ * The pacing half is not optional: one "Reveal price" click can be eighteen requests once
+ * the store's own retry loop gets going, and unpaced that rate-limits the whole engine —
+ * including the API strategy, which was behaving perfectly (AI_ERRORS.md §3). Assets are
+ * left alone; only `/api/*` is metered.
  */
-export async function installStoreRouting(page: Page, opts: BrowserOptions): Promise<void> {
-  const plan = opts.simulate ? planFor(opts.simulate) : [];
+export async function installStoreRouting(page: Page, opts: BrowserOptions, attempt = 1): Promise<void> {
+  const plan = opts.simulate ? planForAttempt(opts.simulate, attempt) : [];
+  let step = 0;
 
   await page.route('**/api/**', async (route: Route) => {
     const url = route.request().url();
@@ -170,10 +165,16 @@ export async function installStoreRouting(page: Page, opts: BrowserOptions): Pro
 
     // Snapshot the index before incrementing: `notify` is a closure, and reading the
     // counter at call time reported every fault one step ahead of where it was.
-    const index = simulationStep;
-    simulationStep++;
+    const index = step;
+    step++;
     const notify = (what: string, detail: Record<string, unknown> = {}): void =>
-      opts.onSimulatedFault?.(what, { url, step: Math.min(index + 1, plan.length), of: plan.length, ...detail });
+      opts.onSimulatedFault?.(what, {
+        url,
+        attempt,
+        step: Math.min(index + 1, plan.length),
+        of: plan.length,
+        ...detail,
+      });
 
     const current = plan[index];
     if (!current) {

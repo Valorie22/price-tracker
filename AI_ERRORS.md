@@ -184,9 +184,23 @@ store's front-end retries only on failure, so holding its first quote request fo
 just made it wait — it then succeeded on that same attempt, consumed the delay step, and never
 reached the failures behind it. The demo of failure handling contained no failure.
 
-**Correction:** the fault plan for `all` now runs the 503s first and the delay second. Attempt
-1 fails for real and backs off; the nine-second hold lands on attempt 2 as the wait before the
-recovery. The ordering is a comment in `planFor()`, because it looks arbitrary and is not.
+**Correction, in two steps.** Reordering it — failures first, delay second — produced a real
+failure, but the run then took *four* attempts, because the failures leaked across attempt
+boundaries in a way that varied with timing. One run recovered on attempt 2; the next used the
+entire retry budget and would have reported FAILED if the store had had one genuine bad moment.
+That is not something to build a recording around.
+
+So the fault plan is now scoped to an **engine attempt** rather than to the session: attempt 1
+meets the 503 run, attempt 2 meets the slow response, and everything after meets a healthy
+store. The narrative is the same every time — fail, back off, wait, recover, in 34 seconds:
+
+```
+02:07:36  ⚡ forced HTTP 503 upstream_error (1/8) … (6/8)
+02:07:50  attempt failed — backing off   code=PARSE_MISS waitMs=676
+02:07:57  ⚡ holding the quote request for 9000 ms (1/1)
+02:08:06  figure read from the page  price=129165
+  SUCCESS  after 2 attempts in 34.2s
+```
 
 **Lesson:** "the demo ran without errors" is not the same as "the demo showed what it was
 built to show". The only way to know was to watch the output, which is also the argument for

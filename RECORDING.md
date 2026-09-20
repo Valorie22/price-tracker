@@ -129,8 +129,16 @@ and every attempt that did not is still in the log.**
 npm run scrape:headed -w backend -- --product=15 --simulate=all
 ```
 
-Slow response → 503 run → recovery, in a single ~40-second run. Shorter, but each phase gets
-less room; the separate takes above read better.
+One run, ~34 seconds, and it does the same thing every time because the fault plan is scoped
+to the engine attempt rather than to the clock:
+
+```
+attempt 1   ⚡ forced HTTP 503 × 6  →  the page gives up  →  PARSE_MISS  →  backoff
+attempt 2   ⚡ quote held 9000 ms   →  the real store answers  →  validated  →  SUCCESS
+```
+
+Shorter than the separate takes above, and each phase gets less room — but if you only have
+one clean shot in you, this is the one to take.
 
 ---
 

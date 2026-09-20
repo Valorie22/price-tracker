@@ -33,7 +33,7 @@ export function configureBrowserStrategy(opts: BrowserOptions): void {
 
 export async function runBrowserExtraction(
   storeProductId: string,
-  ctx: Pick<StrategyContext, 'onStage'> & { simulate?: BrowserOptions['simulate'] },
+  ctx: Pick<StrategyContext, 'onStage'> & { simulate?: BrowserOptions['simulate']; attempt?: number },
   opts: BrowserOptions = {},
 ): Promise<StrategyResult> {
   const started = Date.now();
@@ -44,7 +44,7 @@ export async function runBrowserExtraction(
   const page = await context.newPage();
 
   try {
-    await installStoreRouting(page, merged);
+    await installStoreRouting(page, merged, ctx.attempt ?? 1);
     await merged.onPage?.(page);
 
     ctx.onStage?.('browser:navigating', { url: productUrl(storeProductId) });

@@ -28,7 +28,7 @@ import { isDbConfigured } from '../src/db/client.js';
 import { getLogs, getProductByStoreId, getTrackedWithProduct, listTracked, trackProduct, upsertProducts } from '../src/db/queries.js';
 import type { ProductRow, TrackedProductRow } from '../src/db/types.js';
 import { scrapeOne, type ScrapeStageEvent } from '../src/scraper/engine.js';
-import { closeBrowser, resetSimulation, type SimulationMode } from '../src/scraper/browser.js';
+import { closeBrowser, type SimulationMode } from '../src/scraper/browser.js';
 import { configureBrowserStrategy } from '../src/scraper/strategies/browser.js';
 import { fetchCatalogSample, fetchProduct, productUrl, type StoreProduct } from '../src/scraper/storeClient.js';
 import { closeFetcher } from '../src/scraper/fetcher.js';
@@ -299,7 +299,6 @@ async function main(): Promise<void> {
   const storeProduct = await resolveProduct(PRODUCT);
   log.info('product resolved', { id: storeProduct.id, name: storeProduct.name, url: productUrl(storeProduct.id) });
 
-  resetSimulation();
   configureBrowserStrategy({
     headless: HEADLESS,
     slowMo: HEADLESS ? 0 : 250,
