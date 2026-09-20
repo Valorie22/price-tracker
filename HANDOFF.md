@@ -36,22 +36,23 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ## 1 · GitHub — push the repository
 
-### One decision to make first
+### Already decided, reversible either way
 
-`BUILD_SPEC.md` is the build spec this project was written against, and it is currently committed.
-Keeping it is the transparent choice and it is consistent with the brief, which explicitly
-asks the design note to cover what your AI tools got wrong — `DESIGN_NOTE.md` §3 and
-`AI_ERRORS.md` already disclose that in detail.
+Two files were removed from the repository and left on disk:
 
-If you would rather it not appear in the submitted repository:
+- **`Software_Engineer_Intern_Assignment.pdf`** — INE's own document. Not ours to republish.
+- **`BUILD_SPEC.md`** — the build spec this was written against. AI use is disclosed properly and
+  in detail in `DESIGN_NOTE.md` §3 and `AI_ERRORS.md`, both of which are graded deliverables,
+  so this file adds nothing the brief asks for.
+
+To put either back:
 
 ```bash
-git rm --cached BUILD_SPEC.md && echo "BUILD_SPEC.md" >> .gitignore
-git commit -m "chore: keep the build spec out of the public repository"
+# remove its line from .gitignore first, then
+git add -f BUILD_SPEC.md && git commit -m "chore: include the build spec"
 ```
 
-Nothing references it except this paragraph, so removing it breaks nothing. Your call — but
-make it before you push, not after.
+The branch has also been renamed `master` → `main`.
 
 ### Push
 
