@@ -19,3 +19,11 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 frontend/tsconfig.tsbuildinfo
+
+# INE's own assignment PDF — theirs, not ours to republish. Kept on disk.
+Software_Engineer_Intern_Assignment.pdf
+
+# The build spec this project was written against. AI use is disclosed properly in
+# DESIGN_NOTE.md section 3 and AI_ERRORS.md, which are graded deliverables; this file
+# adds nothing the brief asks for. Kept on disk.
+BUILD_SPEC.md
