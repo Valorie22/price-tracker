@@ -6,12 +6,16 @@ values to copy, and the verification evidence to capture at the end.
 
 **Time: about 25 minutes**, most of it waiting for Render's first build.
 
-> **Status:** no Supabase, Vercel, Render or GitHub credential was present in
-> `secrets/CREDENTIALS.md` or the environment during the build, so no deployment was
-> performed. Everything below has been rehearsed against the built artefact where that was
-> possible without an account — the boot sequence, the health endpoint, the cron rejection
-> path and the search fallback were all executed locally against `backend/dist/index.js`
-> (evidence in §7).
+> **Status, 2026-09-20.**
+> **§2 Supabase — done.** Project `ine-price-tracker` (ref `mpxqbtqwmtgakzintwev`,
+> ap-southeast-1) created on the free tier, schema applied and verified, security advisor
+> findings fixed. One value still needed by hand: the `service_role` key (see §2).
+> **§1 GitHub, §3 Render, §5 cron-job.org — not done**, no credential available.
+> **§4 Vercel** — connector is authenticated, but the frontend needs a live Render URL first.
+>
+> Everything not needing an account was executed rather than assumed: the boot sequence, the
+> health endpoint, the cron rejection path and the search fallback all ran against
+> `backend/dist/index.js` (§7).
 
 ---
 
@@ -73,13 +77,45 @@ no secrets — the tests run entirely offline.
 
 ---
 
-## 2 · Supabase — create the database
+## 2 · Supabase — DONE, except one key
 
-1. [supabase.com](https://supabase.com) → **New project**. Region **ap-south-1 (Mumbai)** if
-   offered; it is closest to both the store and the Render region in `render.yaml`.
-2. Wait for provisioning (~2 min).
+The project already exists and the schema is applied and verified:
 
-### Then, one command
+| | |
+|---|---|
+| Project | `ine-price-tracker` |
+| Ref | `mpxqbtqwmtgakzintwev` |
+| URL | `https://mpxqbtqwmtgakzintwev.supabase.co` |
+| Region | ap-southeast-1 (Singapore — colocated with the Render region in `render.yaml`) |
+| Plan | Free, $0/month |
+| Dashboard | https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev |
+
+Verified against the live database, not assumed: 8 tables, the `tracked_overview` view, 3
+functions, RLS enabled on every table, 0 policies, `pg_trgm` in the `extensions` schema. The
+constraints, the cascades and the overlap lock were each exercised and cleaned up. The
+security advisor reports only the intentional `rls_enabled_no_policy` notice — which is the
+design: no policies means the publishable key can read and write nothing.
+
+> The advisor also caught a genuine hole on the first pass: `tracked_overview` was created
+> SECURITY DEFINER, so it bypassed RLS on all four tables it joins while `anon` held SELECT on
+> it. Fixed, and written up in `AI_ERRORS.md` §8. `db/schema.sql` now produces the hardened
+> state from scratch, and `backend/tests/schema.test.ts` asserts it.
+
+### The one thing left: the service-role key
+
+The Supabase connector deliberately does not expose service-role keys, so this one is copied
+by hand — once:
+
+1. Open **https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev/settings/api-keys**
+2. Reveal **`service_role`** and copy it
+3. Paste it into `backend/.env` on the `SUPABASE_SERVICE_ROLE_KEY=` line (already created,
+   gitignored, with the URL and cron secret filled in)
+
+That key bypasses RLS. Server only — never in a browser, never committed.
+
+### Applying the schema elsewhere
+
+If you ever need to rebuild it, either paste `db/schema.sql` into the SQL editor or:
 
 Generate a personal access token at
 [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) and:
@@ -95,23 +131,7 @@ guessing.
 
 The token is read from the environment, used, and never written anywhere.
 
-### Or by hand
-
-3. **SQL Editor → New query** → paste the whole of `db/schema.sql` → **Run**.
-   It is idempotent, so re-running is safe. Expect `Success. No rows returned`.
-4. **Project Settings → Data API** → copy the **Project URL**.
-5. **Project Settings → API Keys** → reveal and copy the **`service_role`** key.
-   This key bypasses RLS. It belongs on the server and nowhere else.
-
-Confirm the schema landed:
-
-```sql
-select table_name from information_schema.tables
-where table_schema = 'public' order by 1;
-```
-
-Expect: `alerts`, `cron_locks`, `cron_runs`, `price_history`, `products`, `scrape_logs`,
-`structure_fingerprints`, `tracked_products`, and the `tracked_overview` view.
+Both routes are idempotent, so re-running is safe.
 
 ---
 
