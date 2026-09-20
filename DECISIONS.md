@@ -97,3 +97,16 @@ baseline glyphs in three styles, genuinely broken paths where data was rejected,
 state band — three things a general-purpose chart component makes harder rather than easier.
 The chart is where the brief says to spend the effort, so it is built directly. Dependency
 removed rather than left installed and unused.
+
+**D19 · Chart gaps are computed from the data, not from the configured interval.**
+Driving the UI in a browser exposed the bug: a product whose interval had been changed to
+30 minutes rendered every historical 2-hourly reading as an isolated dot, because each was
+"further apart than expected". The median observed spacing is what a series actually does;
+the configured interval is only the fallback when there are too few points for a median to
+mean anything. `frontend/src/lib/gaps.ts`.
+
+**D20 · Invisible characters never appear literally in source.**
+The store emits NBSP and zero-width joiners inside its prices, so those characters
+legitimately belong in our patterns — as `\u00A0` and `\u200B` escapes. A literal zero-width
+space in a regex is invisible in a diff, survives a copy-paste, and is impossible to review.
+`no-irregular-whitespace` is on so it stays that way.
