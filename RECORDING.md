@@ -78,9 +78,9 @@ npm run scrape:headed -w backend -- --product=15 --simulate=error
 
 Watch for, in order:
 
-1. `⚡ simulated fault — forced HTTP 503 upstream_error (1/6) … (6/6)` — six failures, which
-   is exactly the store's own internal retry budget. Fewer would be absorbed silently and our
-   engine would never see a problem.
+1. `⚡ simulated fault — forced HTTP 503 upstream_error (1/8) … (6/8)` — the plan holds the
+   store's own internal retry budget of six, plus a small margin. Fewer than six would be
+   absorbed silently by the page and our engine would never see a problem.
 2. The store's page gives up and renders **"Couldn't load the price after 6 attempts."**
 3. Our engine classifies it: `attempt failed — backing off  code=PARSE_MISS`.
 4. **The overlay's backoff bar counts down** to the next attempt. Let it run.
@@ -96,6 +96,8 @@ time          #   outcome   strategy  ms      error
 02:18:44.201  1   retried   browser   19270   PARSE_MISS
 02:19:10.560  2   success   browser   5393
 ```
+
+(The exact figures will differ — the store moves its prices. The shape will not.)
 
 Read that table out. It is the honest-logging requirement in four lines: the failure is a
 row, not a silence, and the run that recovered still says it had to.
