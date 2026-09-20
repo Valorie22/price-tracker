@@ -5,8 +5,11 @@ build/
 .env.local
 .env.*.local
 secrets/
+
+# Raw captures from the store: its minified bundle and unprocessed responses.
+# Not redistributed. `recon/README.md` says how to regenerate them in one command.
 recon/raw/
-recon/tools/
+recon/latency-progress.txt
 *.log
 .DS_Store
 .vercel
