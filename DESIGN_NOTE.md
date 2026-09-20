@@ -193,7 +193,7 @@ calls `scrapeOne`, not a copy of it.
 
 ## 3. What the AI got wrong, and how it was corrected
 
-Six real mistakes, with the output that caught each one. The full text, including the error
+Eight real mistakes, with the output that caught each one. The full text, including the error
 messages, is in [`AI_ERRORS.md`](AI_ERRORS.md).
 
 **1 · It assumed the store was a server-rendered shop.** The plan for the first five minutes
@@ -247,10 +247,30 @@ module-not-found. Caught by running the built artefact. *Correction:* a separate
 `tsconfig.build.json` that compiles `src` alone. *What it changed:* every verification step in
 `HANDOFF.md` is an execution against a real URL rather than a reading of configuration.
 
-**The pattern across all six.** Every one was caught by *running something* — curl, a probe, a
-headed run, the test suite, the built binary — and none would have been caught by reading the
-code. Four produced output that looked like a data problem and was actually a transport,
-timing or packaging problem. That is why this project's failure taxonomy is as detailed as it
+**7 · `--simulate=all` ordered its faults so that no failure ever happened.** A slow response
+is not a failed one: the store waited out the nine-second hold, succeeded on its first internal
+attempt, and the six queued 503s were never served. The demonstration of failure handling
+contained no failure. *Correction:* the fault plan is scoped to an engine attempt — attempt 1
+meets the 503 run, attempt 2 meets the slow response — so the narrative is identical every run.
+
+**8 · A view that silently bypassed every RLS policy in the database.** Supabase's security
+advisor, run against the real project, found `tracked_overview` defined SECURITY DEFINER — so
+it ignored RLS on the four tables it joins, and `anon` held SELECT on it. The whole catalogue,
+every price and the entire scrape log were readable with the publishable key, through the one
+object that joins all of them. *Correction:* `security_invoker = on`, pinned `search_path` on
+every function, `pg_trgm` out of `public`, and all `anon`/`authenticated` grants revoked. Then
+I got the follow-up wrong too, blaming `create or replace` for re-granting EXECUTE to PUBLIC;
+it does not. A new function's `proacl` is NULL, and NULL means *default* privileges — EXECUTE
+to PUBLIC — so revoking from `anon` accomplishes nothing while PUBLIC holds it. *What it
+changed:* no local test could have caught this, because `anon` and `service_role` do not exist
+in pglite. The schema now carries the hardening, and the test asserts the ACL is non-NULL as
+well as PUBLIC-free — the first version passed vacuously on exactly the vulnerable state.
+
+**The pattern across all eight.** Every one was caught by *running something* — curl, a probe, a
+headed run, the test suite, the built binary, a security advisor against the live database —
+and none would have been caught by reading the code. Four produced output that looked like a
+data problem and was actually a transport, timing or packaging problem. The last one could not
+have been caught locally at all: the roles it concerns do not exist outside Supabase. That is why this project's failure taxonomy is as detailed as it
 is, and why the scrape log records the classified cause of every attempt rather than just its
 outcome.
 

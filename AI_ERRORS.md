@@ -205,3 +205,68 @@ store. The narrative is the same every time — fail, back off, wait, recover, i
 **Lesson:** "the demo ran without errors" is not the same as "the demo showed what it was
 built to show". The only way to know was to watch the output, which is also the argument for
 `RECORDING.md` being a shot list of things to *see* rather than commands to run.
+
+### 8 · A view that silently bypassed every RLS policy in the database
+
+**When:** minutes after applying the schema to the real Supabase project, running the
+security advisor on it.
+
+**What I had built:** RLS enabled on all eight tables with no policies, so the public anon
+key can read and write nothing. Everything goes through the backend with the service-role
+key. That design is sound, it is documented in `DESIGN_NOTE.md`, and the test suite asserted
+it — against pglite, where `anon` does not exist.
+
+**What the advisor found:**
+
+```
+ERROR  security_definer_view
+       View `public.tracked_overview` is defined with the SECURITY DEFINER property
+```
+
+Postgres creates views as SECURITY DEFINER unless told otherwise, so `tracked_overview` ran
+with its *owner's* rights and did not apply RLS to the tables underneath it. And Supabase
+grants `anon` SELECT on new objects by default:
+
+```sql
+select has_table_privilege('anon','public.tracked_overview','SELECT');  -- true
+```
+
+That view joins `products`, `tracked_products`, `price_history` and `scrape_logs`. The entire
+catalogue, every price, and the whole scrape log were readable with the publishable key —
+through the single object that conveniently joins all of them. RLS on the tables was doing
+nothing to stop it.
+
+**Correction:** `security_invoker = on` on the view, so RLS applies; `search_path` pinned on
+all three functions; `pg_trgm` moved out of `public`; and every grant to `anon` and
+`authenticated` revoked, since nothing outside the backend needs one. ERROR and both WARNs
+cleared.
+
+**Then I got the second half wrong.** Checking the fix, `anon` could still execute
+`search_products`. I diagnosed it as an ordering bug — "`create or replace function` re-grants
+EXECUTE to PUBLIC, so my revoke above the definitions was undone" — wrote that into the schema
+comments, and moved on. It was wrong. Four lines of Postgres settled it:
+
+```
+1. freshly created                             proacl = null
+2. after REVOKE ... FROM anon                  {=X/postgres,postgres=X/postgres}
+3. after create-or-replace                     {=X/postgres,postgres=X/postgres}   ← unchanged
+4. after REVOKE ... FROM PUBLIC                {postgres=X/postgres}
+```
+
+`create or replace` does not re-grant anything. The real cause is that a new function's
+`proacl` is **NULL**, and NULL does not mean "no grants" — it means *default* privileges,
+which for a function is EXECUTE to PUBLIC. Revoking from `anon` never removes that, because
+anon holds it through PUBLIC; all the revoke does is materialise the ACL so PUBLIC's entry
+finally becomes visible. The revoke has to target PUBLIC.
+
+**What it changed:** the fix, the comments in `db/schema.sql`, and the test. The first version
+of the test asserted "the ACL string contains no PUBLIC entry" — which passes vacuously on a
+NULL ACL, i.e. on precisely the vulnerable state. It now asserts the ACL is non-NULL *and*
+carries no PUBLIC entry.
+
+**Lesson that shaped the build:** two of them, and the second is the sharper one. A guarantee
+that holds in the test environment can be absent in production — `anon`, `authenticated` and
+`service_role` do not exist in pglite, so no local test could ever have caught this; it took
+running the advisor against the real project. And in a permission system, *absence of a
+visible grant is not absence of a grant*. A NULL ACL and a locked-down ACL look equally empty
+and mean opposite things.

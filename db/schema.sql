@@ -5,9 +5,13 @@
 -- ============================================================================
 
 -- gen_random_uuid() has been core Postgres since 13, so pgcrypto is not needed.
--- pg_trgm powers the similarity ranking in search_products (see the bottom of this file);
--- it ships with Supabase and only needs enabling.
-create extension if not exists "pg_trgm";
+--
+-- pg_trgm powers the similarity ranking in search_products (see the bottom of this
+-- file). It is installed into `extensions` rather than `public`: an extension in the
+-- search path is a function a shadowing object can take precedence over, and every
+-- function below pins its search_path for the same reason.
+create schema if not exists extensions;
+create extension if not exists "pg_trgm" with schema extensions;
 
 -- ---------------------------------------------------------------------------
 -- products - catalogue snapshot ingested from the store.
@@ -31,7 +35,7 @@ create table if not exists products (
   last_seen_at      timestamptz not null default now()
 );
 
-create index if not exists products_name_trgm_idx on products using gin (lower(name) gin_trgm_ops);
+create index if not exists products_name_trgm_idx on products using gin (lower(name) extensions.gin_trgm_ops);
 create index if not exists products_category_idx  on products (category);
 
 -- ---------------------------------------------------------------------------
@@ -192,6 +196,8 @@ returns table (
 )
 language sql
 stable
+security invoker
+set search_path = public, extensions, pg_temp
 as $$
   select p.store_product_id, p.name, p.brand, p.category, p.sku, p.slug, p.url,
          greatest(
@@ -233,6 +239,8 @@ create table if not exists cron_locks (
 create or replace function try_acquire_cron_lock(p_run_id uuid, p_stale_seconds int default 600)
 returns boolean
 language plpgsql
+security invoker
+set search_path = public, pg_temp
 as $lock$
 declare
   v_holder uuid;
@@ -251,6 +259,8 @@ $lock$;
 create or replace function release_cron_lock(p_run_id uuid)
 returns boolean
 language sql
+security invoker
+set search_path = public, pg_temp
 as $rel$
   delete from cron_locks where name = 'scrape' and run_id = p_run_id returning true;
 $rel$;
@@ -330,3 +340,58 @@ left join latest  l   on l.tracked_product_id   = t.id
 left join ago_24h a24 on a24.tracked_product_id = t.id
 left join ago_7d  a7  on a7.tracked_product_id  = t.id
 left join last_log ll on ll.tracked_product_id  = t.id;
+
+-- Without this the view runs with its OWNER's rights and bypasses row level
+-- security on every table it touches -- which made the whole catalogue, price
+-- history and scrape log readable with the public anon key, straight through
+-- the one object that joins all of them. RLS on the tables was doing nothing
+-- to stop it. Postgres 15+.
+alter view tracked_overview set (security_invoker = on);
+
+-- ---------------------------------------------------------------------------
+-- Grants.
+--
+-- The subtlety that cost a round trip here: a newly created function has
+-- `proacl = NULL`, and NULL does not mean "no grants" -- it means *default*
+-- privileges, which for a function is EXECUTE to PUBLIC. So the grant is real
+-- and invisible at the same time.
+--
+-- `revoke ... from anon` does not remove it. PUBLIC includes every role, so anon
+-- keeps EXECUTE straight through it; all the revoke does is materialise the ACL
+-- and make PUBLIC's entry (`=X/owner`) finally visible. The revoke has to target
+-- PUBLIC. See AI_ERRORS.md section 8.
+--
+-- Nothing outside the backend needs any privilege here. Every read goes through
+-- the API with the service-role key, which bypasses RLS by design. RLS is the
+-- lock; this removes the door as well.
+--
+-- Wrapped in a DO block that skips roles which do not exist, so the file also
+-- applies cleanly to a plain Postgres (which is how the test suite runs it).
+-- ---------------------------------------------------------------------------
+do $grants$
+declare
+  r text;
+begin
+  foreach r in array array['anon', 'authenticated'] loop
+    if exists (select 1 from pg_roles where rolname = r) then
+      execute format('revoke all on all tables    in schema public from %I', r);
+      execute format('revoke all on all routines  in schema public from %I', r);
+      execute format('revoke all on all sequences in schema public from %I', r);
+      execute format('alter default privileges in schema public revoke all on tables    from %I', r);
+      execute format('alter default privileges in schema public revoke all on routines  from %I', r);
+      execute format('alter default privileges in schema public revoke all on sequences from %I', r);
+    end if;
+  end loop;
+
+  -- PUBLIC is the one that actually matters for functions.
+  revoke all on function public.search_products(text, int)       from public;
+  revoke all on function public.try_acquire_cron_lock(uuid, int) from public;
+  revoke all on function public.release_cron_lock(uuid)          from public;
+
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    execute 'grant execute on function public.search_products(text, int)       to service_role';
+    execute 'grant execute on function public.try_acquire_cron_lock(uuid, int) to service_role';
+    execute 'grant execute on function public.release_cron_lock(uuid)          to service_role';
+  end if;
+end
+$grants$;

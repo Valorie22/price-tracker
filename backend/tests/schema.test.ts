@@ -58,6 +58,64 @@ describe('db/schema.sql', () => {
     const res = await db.query(`select policyname from pg_policies where schemaname = 'public'`);
     expect(res.rows).toEqual([]);
   });
+
+  it('installs pg_trgm outside the public schema', async () => {
+    const { schema } = await one<{ schema: string }>(
+      `select n.nspname as schema from pg_extension e
+       join pg_namespace n on n.oid = e.extnamespace where e.extname = 'pg_trgm'`,
+    );
+    expect(schema).toBe('extensions');
+  });
+});
+
+/**
+ * The Supabase security advisor caught both of these on the live project after the
+ * schema was first applied. A view without `security_invoker` runs with its owner's
+ * rights and bypasses RLS on every table it touches — which made the entire tracked
+ * catalogue, price history and scrape log readable with the public anon key, through
+ * the one object that joins all of them. See AI_ERRORS.md §8.
+ */
+describe('hardening — the checks that RLS actually depends on', () => {
+  it('tracked_overview runs as the caller, so RLS applies to it', async () => {
+    const { opts } = await one<{ opts: string | null }>(
+      `select array_to_string(c.reloptions, ',') as opts from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+       where n.nspname = 'public' and c.relname = 'tracked_overview'`,
+    );
+    expect(opts ?? '').toContain('security_invoker=on');
+  });
+
+  it('pins search_path on every function', async () => {
+    const res = await db.query<{ proname: string; proconfig: string[] | null }>(
+      `select p.proname, p.proconfig from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public'
+         and p.proname in ('search_products','try_acquire_cron_lock','release_cron_lock')`,
+    );
+    expect(res.rows).toHaveLength(3);
+    for (const row of res.rows) {
+      expect(row.proconfig, `${row.proname} has no pinned search_path`).not.toBeNull();
+      expect(String(row.proconfig)).toContain('search_path');
+    }
+  });
+
+  it('does not leave EXECUTE granted to PUBLIC on any function', async () => {
+    const res = await db.query<{ proname: string; acl: string | null }>(
+      `select p.proname, p.proacl::text as acl from pg_proc p
+       join pg_namespace n on n.oid = p.pronamespace
+       where n.nspname = 'public'
+         and p.proname in ('search_products','try_acquire_cron_lock','release_cron_lock')`,
+    );
+    expect(res.rows).toHaveLength(3);
+
+    for (const row of res.rows) {
+      // A NULL acl is not "no grants" — it is *default* privileges, which for a
+      // function means EXECUTE to PUBLIC. Asserting only "no PUBLIC entry in the
+      // string" would pass vacuously on exactly the case we care about.
+      expect(row.acl, `${row.proname} has default privileges, i.e. EXECUTE to PUBLIC`).not.toBeNull();
+      // A bare "=" entry is the PUBLIC grant, e.g. {=X/postgres,...}
+      expect(row.acl ?? '', `${row.proname} still grants EXECUTE to PUBLIC`).not.toMatch(/[{,]=/);
+    }
+  });
 });
 
 describe('price_history constraints — the last line of defence', () => {
