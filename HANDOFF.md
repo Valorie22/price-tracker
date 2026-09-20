@@ -34,6 +34,25 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ## 1 · GitHub — push the repository
 
+### One decision to make first
+
+`BUILD_SPEC.md` is the build spec this project was written against, and it is currently committed.
+Keeping it is the transparent choice and it is consistent with the brief, which explicitly
+asks the design note to cover what your AI tools got wrong — `DESIGN_NOTE.md` §3 and
+`AI_ERRORS.md` already disclose that in detail.
+
+If you would rather it not appear in the submitted repository:
+
+```bash
+git rm --cached BUILD_SPEC.md && echo "BUILD_SPEC.md" >> .gitignore
+git commit -m "chore: keep the build spec out of the public repository"
+```
+
+Nothing references it except this paragraph, so removing it breaks nothing. Your call — but
+make it before you push, not after.
+
+### Push
+
 The history is clean: no secrets tracked, `.env.example` committed, `secrets/` and `.env`
 gitignored. Verify before pushing:
 

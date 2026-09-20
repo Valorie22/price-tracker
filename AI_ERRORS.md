@@ -164,3 +164,30 @@ compiled. CI now runs `npm run build` and the Render start path is the one that 
 **Lesson that shaped the build:** "it compiles" is not "it runs". Every verification step in
 `HANDOFF.md` is an execution against a real URL, not a reading of configuration — this is the
 class of bug that only appears when you run the artifact you are about to ship.
+
+### 7 · `--simulate=all` had its two faults in an order that produced no failure at all
+
+**When:** final verification of the observable run, one command before calling it done.
+**What happened:** `--simulate=all` was supposed to show the whole arc — a slow response, then
+a run of 503s, then recovery. Run against the live store, it produced this:
+
+```
+02:04:41.421  ⚡ simulated fault   holding the quote request for 9000 ms (1/7)
+02:04:50.576  figure read from the page   price=129165 stock=Out of stock
+  SUCCESS  after 1 attempt in 12.7s
+```
+
+One attempt, no retry, no backoff. The six queued 503s were never served.
+
+The reason is a distinction I had not made: **a slow response is not a failed response.** The
+store's front-end retries only on failure, so holding its first quote request for nine seconds
+just made it wait — it then succeeded on that same attempt, consumed the delay step, and never
+reached the failures behind it. The demo of failure handling contained no failure.
+
+**Correction:** the fault plan for `all` now runs the 503s first and the delay second. Attempt
+1 fails for real and backs off; the nine-second hold lands on attempt 2 as the wait before the
+recovery. The ordering is a comment in `planFor()`, because it looks arbitrary and is not.
+
+**Lesson:** "the demo ran without errors" is not the same as "the demo showed what it was
+built to show". The only way to know was to watch the output, which is also the argument for
+`RECORDING.md` being a shot list of things to *see* rather than commands to run.

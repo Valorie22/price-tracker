@@ -62,28 +62,51 @@ cronRouter.post('/cron/scrape', async (req, res) => {
 
   // Acknowledge first, work second.
   const acceptedAt = new Date().toISOString();
-  let settled = false;
   const runPromise = runCycle({ triggerSource: 'cron', force });
+
+  // Never let this promise reject on its own. Express 4 does not catch a rejection from
+  // an async handler, so an early failure — Supabase unreachable, say — would surface as
+  // an unhandled rejection and a dead socket instead of a response the caller can read.
+  const settledPromise: Promise<
+    { ok: true; result: Awaited<ReturnType<typeof runCycle>> } | { ok: false; error: unknown }
+  > = runPromise.then(
+    (result) => ({ ok: true as const, result }),
+    (error: unknown) => ({ ok: false as const, error }),
+  );
 
   // Give the run a moment to take (or fail to take) the lock, so a double-fire gets a
   // truthful 409 rather than a cheerful "accepted" that quietly does nothing.
   const raced = await Promise.race([
-    runPromise.then((r) => { settled = true; return r; }),
-    new Promise<null>((r) => setTimeout(() => r(null), 1_500)),
+    settledPromise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 1_500)),
   ]);
 
-  if (raced && raced.skipped) {
-    res.status(409).json({ skipped: raced.skipped, runId: raced.runId, acceptedAt });
-    return;
-  }
-  if (raced && settled) {
-    res.status(200).json(summarise(raced, startedAt));
+  if (raced) {
+    if (!raced.ok) {
+      logger.error('cron run failed before it could be acknowledged', { err: String(raced.error) });
+      res.status(500).json({ error: 'run_failed', message: String(raced.error) });
+      return;
+    }
+    if (raced.result.skipped) {
+      res.status(409).json({ skipped: raced.result.skipped, runId: raced.result.runId, acceptedAt });
+      return;
+    }
+    res.status(200).json(summarise(raced.result, startedAt));
     return;
   }
 
-  runPromise
-    .then((r) => logger.info('background cron run finished', { runId: r.runId, attempted: r.attempted, succeeded: r.succeeded }))
-    .catch((err) => logger.error('background cron run failed', { err: String(err) }));
+  // Still running. Acknowledge, and report the outcome to the log when it lands.
+  void settledPromise.then((outcome) => {
+    if (outcome.ok) {
+      logger.info('background cron run finished', {
+        runId: outcome.result.runId,
+        attempted: outcome.result.attempted,
+        succeeded: outcome.result.succeeded,
+      });
+    } else {
+      logger.error('background cron run failed', { err: String(outcome.error) });
+    }
+  });
 
   res.status(202).json({
     accepted: true,

@@ -100,7 +100,12 @@ export async function closeBrowser(): Promise<void> {
  *   slow   hold the first quote request 9 s — the page sits on "Loading current price…"
  *   late   hold it 4 s — the price lands well after the rest of the page
  *   error  answer 503 six times, then let the real request through
- *   all    one slow response, then the 503 run, then recovery — the full narrative
+ *   all    the 503 run, then a slow response, then recovery — the full narrative
+ *
+ * The order of `all` is not cosmetic. A slow response is not a *failed* response: the page
+ * simply waits it out and succeeds on its first internal attempt, consuming the delay and
+ * leaving the 503s untouched. Putting the failures first makes attempt 1 fail for real, and
+ * the 9-second hold then lands on attempt 2 as the wait before the recovery.
  */
 interface SimulationStep {
   kind: 'delay' | 'fail';
@@ -121,7 +126,7 @@ function planFor(mode: SimulationMode): SimulationStep[] {
     case 'slow': return [{ kind: 'delay', ms: 9_000 }];
     case 'late': return [{ kind: 'delay', ms: 4_000 }];
     case 'error': return fail(STORE_INTERNAL_RETRIES);
-    case 'all': return [{ kind: 'delay', ms: 9_000 }, ...fail(STORE_INTERNAL_RETRIES)];
+    case 'all': return [...fail(STORE_INTERNAL_RETRIES), { kind: 'delay', ms: 9_000 }];
   }
 }
 
