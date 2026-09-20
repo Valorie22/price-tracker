@@ -166,7 +166,7 @@ Two jobs at [cron-job.org](https://cron-job.org):
 | | Job 1 — scrape | Job 2 — keepalive |
 |---|---|---|
 | **Title** | `INE tracker — scrape` | `INE tracker — keepalive` |
-| **URL** | `https://<render-url>/api/cron/scrape` | `https://<render-url>/api/cron/keepalive` |
+| **URL** | `https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape` | `https://ine-price-tracker-api-oorv.onrender.com/api/cron/keepalive` |
 | **Method** | `POST` | `GET` |
 | **Schedule** | `0 */2 * * *` (every 2 hours) | every 10 minutes |
 | **Header** | `x-cron-secret: <your CRON_SECRET>` | — |

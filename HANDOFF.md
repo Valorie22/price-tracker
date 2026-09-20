@@ -6,38 +6,34 @@ values to copy, and the verification evidence to capture at the end.
 
 **Time: about 25 minutes**, most of it waiting for Render's first build.
 
-> ### RESUMING IN A NEW SESSION? START HERE.
+> ### STATUS — 20 September 2026, deployed and verified in production.
 >
-> **Done and proven:** Supabase live and hardened, 1,000 products indexed, full scrape
-> pipeline run end to end against the live store (§6 has the real output). 103 tests, lint,
-> typecheck and build all green. 23 commits on `main`, nothing uncommitted, no secrets tracked.
-> `backend/.env` exists (gitignored) with the Supabase URL, the service-role key and the cron
-> secret — a new session can just use it.
+> **Everything in this file except the recording and the cron schedule is done.**
 >
-> **Blocked on exactly one thing:** the GitHub repo
-> https://github.com/Valorie22/price-tracker was created and is **empty**. The push was
-> rejected because the personal access token had `repo` scope but not `workflow`, and the
-> history contains `.github/workflows/ci.yml`. A token with **both `repo` and `workflow`**
-> fixes it — nothing else is wrong.
+> | | |
+> |---|---|
+> | Live app | https://ine-price-tracker-eight.vercel.app |
+> | API | https://ine-price-tracker-api-oorv.onrender.com |
+> | Repository | https://github.com/Valorie22/price-tracker (public) |
+> | Supabase | `mpxqbtqwmtgakzintwev`, ap-southeast-1 |
 >
-> **Then, in order:** push → Render (§3, connector available) → Vercel (§4, connector already
-> authenticated) → set `CORS_ORIGINS` to the Vercel origin → cron-job.org (§5, manual) →
-> capture §6 evidence against the Render URL.
+> **Done since the last session:** pushed 25 commits (the `workflow` token scope was the only
+> blocker); Render web service live in Singapore with `/api/health` reporting
+> `database: reachable`; Vercel production deploy with `VITE_API_BASE_URL` baked in and Vercel
+> Auth explicitly disabled; `CORS_ORIGINS` pinned to both Vercel hostnames; and the whole of
+> §6 re-run against the live Render URL — the real output is inline below, replacing the
+> local-run placeholders.
 >
-> **Housekeeping:** the Supabase service-role key and the GitHub token were both pasted into a
-> chat. Rotate both once submitted.
+> **One thing left that needs a login:** the two cron-job.org jobs in §5. Field values are
+> there; the secret is in `secrets/CREDENTIALS.md` (gitignored), never in this file.
 >
-> ---
+> **Then:** record the clip per `RECORDING.md`, paste its link into §8 and
+> `SUBMISSION_EMAIL.md`, attach the resume, send.
 >
-> **Status, 2026-09-20.**
-> **§2 Supabase — done and proven.** Project `ine-price-tracker`
-> (ref `mpxqbtqwmtgakzintwev`, ap-southeast-1, free tier). Schema applied, security advisor
-> findings fixed, all 1,000 products indexed, and the **full pipeline run end to end against
-> the live store and live database** — see §6, which now contains real output rather than
-> placeholders.
-> **§1 GitHub, §3 Render, §5 cron-job.org — not done**, no credential available.
-> **§4 Vercel** — connector authenticated, but the frontend needs a live Render URL first.
-
+> **Housekeeping — rotate these once submitted.** All three were pasted into a chat: the
+> Supabase `service_role` key, the original GitHub token, and the replacement GitHub token
+> with `workflow` scope.
+>
 ---
 
 ## 0 · Your generated cron secret
@@ -175,7 +171,7 @@ Both routes are idempotent, so re-running is safe.
 **Verify it is alive** (substitute your URL):
 
 ```bash
-curl -s https://<render-url>/api/health | jq
+curl -s https://ine-price-tracker-api-oorv.onrender.com/api/health | jq
 ```
 
 Expected — note `database` must say `reachable`:
@@ -261,7 +257,7 @@ a fifth of its budget on a cold start.
 | Field | Value |
 |---|---|
 | Title | `INE tracker — scrape` |
-| URL | `https://<render-url>/api/cron/scrape` |
+| URL | `https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape` |
 | Schedule | **Custom** → `0 */2 * * *` |
 | Request method | `POST` (under **Advanced**) |
 | Header | `x-cron-secret` : `<your CRON_SECRET>` |
@@ -273,7 +269,7 @@ a fifth of its budget on a cold start.
 | Field | Value |
 |---|---|
 | Title | `INE tracker — keepalive` |
-| URL | `https://<render-url>/api/cron/keepalive` |
+| URL | `https://ine-price-tracker-api-oorv.onrender.com/api/cron/keepalive` |
 | Schedule | every 10 minutes (`*/10 * * * *`) |
 | Request method | `GET` |
 | Timeout | 10 s |
@@ -289,9 +285,76 @@ retries can take longer.
 
 All five are executions, not configuration reviews. Substitute your URLs and secret.
 
-These were all executed on 2026-09-20 against the live Supabase project, with the backend
-running locally. Re-run them against the Render URL once §3 is done; the outputs should
-match in shape.
+> **Re-run against the live Render URL on 2026-09-20 at 14:56–15:00 UTC. All five pass.**
+> The production output is collected here; the per-section detail below it is from the
+> earlier local run against the same database, kept because it exercises paths the
+> production pass did not repeat.
+>
+> **6.1 Health** — `200` in 1.27 s, and the field that matters is `database`:
+>
+> ```json
+> {"ok":true,"version":"1.0.0","env":"production","uptimeSeconds":81,
+>  "database":"reachable","store":"https://demo.inelabteamdev.com",
+>  "lastRunAt":"2026-09-20T14:08:37.311184+00:00"}
+> ```
+>
+> `GET /api/cron/keepalive` → `200 {"ok":true}` in 0.19 s.
+>
+> **6.2 A real cron-triggered scrape** — `runId 3349e2b4`, attempted 3, succeeded 3, 9.5 s,
+> every one via the `api` strategy. Prices had moved since the local run, as they should.
+>
+> **6.3 Two concurrent runs** — the lock holds in production:
+>
+> ```
+> call A: HTTP 409  {"runId":"85ebc2a0…","skipped":"run in progress","attempted":0}
+> call B: HTTP 200  {"runId":"5914b62c…","attempted":3,"succeeded":3,"durationMs":6404}
+> ```
+>
+> **6.4 End to end in the browser** — the dashboard loads from the Render API across CORS,
+> `⌘K` search returns live hits from the 1,000-row index (`slimbook` → 12,
+> `source: "index"`), the detail page draws the strip chart with its attempt ticks, and the
+> scrape log shows the non-success rows without hiding them. **Scrape now** fired a real run
+> whose four attempts are quoted below.
+>
+> **6.5 A deliberately broken product** — `Helix Turntable Lite` was repointed at store id
+> `999999`, scraped, then restored to `326`:
+>
+> ```
+> failure logged at   14:58:29   failed / PRODUCT_GONE / attempt 1 / HTTP 404
+> newest history row  14:57:58   <- 31 seconds EARLIER
+> history rows written after the failure        0
+> tracking auto-paused                       true
+> alert raised                        product_gone
+> ```
+>
+> A 404 is not retried, because the answer will not change.
+>
+> **The run worth reading twice.** The manual **Scrape now** hit the live store's real
+> defences — nothing simulated, no route interception:
+>
+> ```
+> 15:00:15  att 1  retried  —         429  HTTP_429      <- the store rate-limited us
+> 15:00:22  att 2  retried  —         429  HTTP_429
+> 15:00:27  att 3  retried  api  200  STALE_QUOTE   <- HTTP 200, price refused as pending
+> 15:00:34  att 4  failed   —         500  HTTP_5XX      <- retry budget exhausted
+> ```
+>
+> Four attempts, three `retried`, one `failed`, and **zero** rows added to `price_history`.
+> The attempt at 15:00:27 is the whole argument for this design: a completely successful HTTP
+> response carrying a number that must not be stored.
+>
+> **Integrity across the whole database, after all of the above:**
+>
+> ```
+> history rows total                          15
+> scrape_logs rows total                      26
+>   of which NOT success                      11   (9 retried, 2 failed)
+> rows todays validation would reject          0   <- the definition of done
+> history rows with no originating log row     0
+> duplicate history rows for one instant       0
+> products indexed                         1,000
+> tracked products, all active                 3
+> ```
 
 ### 6.1 Health
 
@@ -316,7 +379,7 @@ INFO backend listening  port=8080 store=https://demo.inelabteamdev.com
 Track at least one product first (open the Vercel URL, press ⌘K, search, Enter). Then:
 
 ```bash
-curl -s -X POST "https://<render-url>/api/cron/scrape?wait=1&force=1" \
+curl -s -X POST "https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape?wait=1&force=1" \
   -H "x-cron-secret: <CRON_SECRET>" | jq
 ```
 
@@ -356,9 +419,9 @@ retry policy stores that number.
 
 ```bash
 curl -s -o /tmp/a.json -w "first  %{http_code}\n" -X POST \
-  "https://<render-url>/api/cron/scrape?wait=1&force=1" -H "x-cron-secret: <CRON_SECRET>" &
+  "https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape?wait=1&force=1" -H "x-cron-secret: <CRON_SECRET>" &
 curl -s -o /tmp/b.json -w "second %{http_code}\n" -X POST \
-  "https://<render-url>/api/cron/scrape?wait=1&force=1" -H "x-cron-secret: <CRON_SECRET>" &
+  "https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape?wait=1&force=1" -H "x-cron-secret: <CRON_SECRET>" &
 wait
 cat /tmp/a.json /tmp/b.json
 ```
@@ -424,7 +487,7 @@ where store_product_id = (select store_product_id from products
 ```
 
 ```bash
-curl -s -X POST "https://<render-url>/api/cron/scrape?wait=1&force=1" \
+curl -s -X POST "https://ine-price-tracker-api-oorv.onrender.com/api/cron/scrape?wait=1&force=1" \
   -H "x-cron-secret: <CRON_SECRET>" | jq '.products'
 ```
 
@@ -550,12 +613,17 @@ overflow at any width, no unlabelled controls, every hit target at least 24 px.
 
 | | |
 |---|---|
-| Live app | `https://…vercel.app` |
-| API | `https://…onrender.com` |
-| Repository | `https://github.com/…` |
-| Recording | `https://…` |
-| First cron run at | |
-| Second cron run at | |
+| Live app | https://ine-price-tracker-eight.vercel.app |
+| API | https://ine-price-tracker-api-oorv.onrender.com |
+| Repository | https://github.com/Valorie22/price-tracker |
+| Recording | `https://…` *(record per RECORDING.md, then paste here and in SUBMISSION_EMAIL.md)* |
+| First cron run at | *(fill from cron-job.org once job 1 has fired)* |
+| Second cron run at | *(fill from cron-job.org once job 1 has fired twice)* |
+
+Dashboards: [Render](https://dashboard.render.com/web/srv-danv6nek1f9s73a37cdg) ·
+[Vercel](https://vercel.com/valories-projects-20c9e1bb/ine-price-tracker) ·
+[Supabase](https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev) ·
+[Actions](https://github.com/Valorie22/price-tracker/actions)
 
 The definition of done in `BUILD_SPEC.md` §11: two real cron-triggered runs in production, at
 least one genuine non-success row in the scrape log that the UI displays without hiding it,
