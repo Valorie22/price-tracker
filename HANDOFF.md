@@ -8,7 +8,8 @@ values to copy, and the verification evidence to capture at the end.
 
 > ### STATUS — 20 September 2026, deployed and verified in production.
 >
-> **Everything in this file except the recording and the cron schedule is done.**
+> **Everything in this file is done.** What is left is yours: attach the resume and send
+> the email.
 >
 > | | |
 > |---|---|
@@ -31,8 +32,10 @@ values to copy, and the verification evidence to capture at the end.
 > UI shows without hiding them, and zero rows in `price_history` that today's validation
 > would reject.
 >
-> **Then:** record the clip per `RECORDING.md`, paste its link into §8 and
-> `SUBMISSION_EMAIL.md`, attach the resume, send.
+> **Recording — done.** Recorded per `RECORDING.md` and committed as `recording.mp4`, linked
+> from the table above.
+>
+> **Then:** attach the resume and send.
 >
 > **Housekeeping — rotate these once submitted.** All three were pasted into a chat: the
 > Supabase `service_role` key, the original GitHub token, and the replacement GitHub token
@@ -633,7 +636,7 @@ overflow at any width, no unlabelled controls, every hit target at least 24 px.
 | Live app | https://ine-price-tracker-app.vercel.app |
 | API | https://ine-price-tracker-api-oorv.onrender.com |
 | Repository | https://github.com/Valorie22/price-tracker |
-| Recording | `https://…` *(record per RECORDING.md, then paste here and in SUBMISSION_EMAIL.md)* |
+| Recording | https://github.com/Valorie22/price-tracker/blob/main/recording.mp4 — committed as `recording.mp4` |
 | First cron run at | **15:15:44 UTC** — HTTP 202 ack in 3.0 s; run `15:15:46 → 15:16:19`, 3/3 |
 | Second cron run at | **15:31:11 UTC** — HTTP 202 ack in 3.3 s; run `15:31:13 → 15:31:22`, 3/3 |
 

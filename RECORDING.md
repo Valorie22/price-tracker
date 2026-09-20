@@ -4,6 +4,10 @@ A 2–4 minute screen recording of the scraper working against the live store, *
 slow response and a failure**. The brief asks for the failure to be shown; hiding it would
 defeat the point of the clip.
 
+**The submitted clip is in this repository: [`recording.mp4`](recording.mp4).** GitHub plays
+it inline — open the file and press play, no download needed. The rest of this file is the
+shot list it was recorded from.
+
 ---
 
 ## Before you start
