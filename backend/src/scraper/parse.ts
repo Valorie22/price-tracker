@@ -34,11 +34,11 @@ const PLACEHOLDER_TEXTS = new Set([
   'price hidden', 'check price', 'see price', 'reveal price', '--.--', '0', '0.00',
 ]);
 
-const ZERO_WIDTH = /[​-‍⁠﻿­]/g;
+const ZERO_WIDTH = /[\u200B-\u200D\u2060\uFEFF\u00AD]/g;
 
 export function isPlaceholder(raw: string | null | undefined): boolean {
   if (raw === null || raw === undefined) return true;
-  const cleaned = raw.normalize('NFKC').replace(ZERO_WIDTH, '').replace(/ /g, ' ').trim().toLowerCase();
+  const cleaned = raw.normalize('NFKC').replace(ZERO_WIDTH, '').replace(/\u00A0/g, ' ').trim().toLowerCase();
   if (cleaned === '') return true;
   if (PLACEHOLDER_TEXTS.has(cleaned)) return true;
   // A currency symbol with nothing behind it, e.g. "₹", "₹ —", "$0.00".
@@ -53,18 +53,6 @@ export interface ParsedPrice {
   /** Which of the store's rendering variants this text looked like. */
   shape: string;
 }
-
-const CURRENCY_BY_SYMBOL: Record<string, string> = {
-  '₹': 'INR',
-  rs: 'INR',
-  inr: 'INR',
-  $: 'USD',
-  usd: 'USD',
-  '€': 'EUR',
-  eur: 'EUR',
-  '£': 'GBP',
-  gbp: 'GBP',
-};
 
 export function detectCurrency(raw: string, fallback = 'INR'): string {
   const text = raw.normalize('NFKC').replace(ZERO_WIDTH, '').toLowerCase();
@@ -85,7 +73,7 @@ export function parsePriceText(raw: string | null | undefined, fallbackCurrency 
   if (raw === null || raw === undefined) return null;
 
   // NFKC folds full-width digits (１２３ → 123) and the ﹒ style variants.
-  let text = raw.normalize('NFKC').replace(ZERO_WIDTH, '').replace(/ /g, ' ');
+  let text = raw.normalize('NFKC').replace(ZERO_WIDTH, '').replace(/\u00A0/g, ' ');
   const currency = detectCurrency(text, fallbackCurrency);
 
   if (isPlaceholder(text)) return null;
@@ -124,7 +112,7 @@ export function parsePriceText(raw: string | null | undefined, fallbackCurrency 
 }
 
 function classifyShape(raw: string, numeric: string): string {
-  if (/[​ ]/.test(raw) && raw.replace(ZERO_WIDTH, '').length < raw.length) return 'nbsp';
+  if (/[\u200B\u00A0]/.test(raw) && raw.replace(ZERO_WIDTH, '').length < raw.length) return 'nbsp';
   if (/[０-９]/.test(raw)) return 'unicode';
   if (/\/-/.test(raw)) return 'trailing';
   if (/\brs\.?/i.test(raw)) return 'lakh';
@@ -179,7 +167,7 @@ export function stockFromQuantity(quantity: number): StockStatus {
  * a guess in the history is the failure this project is graded on avoiding.
  */
 export function parseStockText(raw: string | null | undefined): ParsedStock {
-  const text = (raw ?? '').normalize('NFKC').replace(ZERO_WIDTH, '').replace(/ /g, ' ').trim();
+  const text = (raw ?? '').normalize('NFKC').replace(ZERO_WIDTH, '').replace(/\u00A0/g, ' ').trim();
   if (text === '') return { status: 'unknown', quantity: null, raw: '' };
 
   for (const { re, status } of STOCK_PATTERNS) {

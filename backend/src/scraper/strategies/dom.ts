@@ -176,7 +176,7 @@ export function extractFromHtml(html: string, layout: StoreLayout | null): DomEx
     scratch('*').each((_, el) => {
       if (/deal\s*price/i.test(scratch(el).text()) && scratch(el).children().length === 0) scratch(el).remove();
     });
-    const text = scratch.root().text().normalize('NFKC').replace(/[​-‍﻿]/g, '');
+    const text = scratch.root().text().normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '');
     const m = /(?:₹|Rs\.?|INR)\s*([0-9][0-9\s.,']*)/i.exec(text);
     const parsed = m ? parsePriceText(m[0]) : null;
     if (parsed) {

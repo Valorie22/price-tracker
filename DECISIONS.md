@@ -90,3 +90,10 @@ One cron job every two hours; `listDueTracked` decides who is actually due. A pr
 **D17 · Tracking a product fires an immediate scrape, out of band.**
 A new tracker with an empty chart is a bad first impression, and the first reading is what
 tells the user the pipeline works. The response does not wait for it.
+
+**D18 · The strip chart is hand-written SVG; Recharts is dropped.**
+The brief's stack named Recharts, and the brief's chart specification asks for per-attempt
+baseline glyphs in three styles, genuinely broken paths where data was rejected, and a stock
+state band — three things a general-purpose chart component makes harder rather than easier.
+The chart is where the brief says to spend the effort, so it is built directly. Dependency
+removed rather than left installed and unused.

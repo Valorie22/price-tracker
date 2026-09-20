@@ -4,7 +4,9 @@
 -- Safe to re-run: every statement is idempotent.
 -- ============================================================================
 
-create extension if not exists "pgcrypto";
+-- gen_random_uuid() has been core Postgres since 13, so pgcrypto is not needed.
+-- pg_trgm powers the similarity ranking in search_products (see the bottom of this file);
+-- it ships with Supabase and only needs enabling.
 create extension if not exists "pg_trgm";
 
 -- ---------------------------------------------------------------------------

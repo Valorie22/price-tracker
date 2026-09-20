@@ -9,7 +9,7 @@
  * costs roughly 1.5 s and ~300 MB on Render's free tier; paying that per product would
  * be the difference between a run that fits in the cron window and one that does not.
  */
-import type { Browser, BrowserContext, Page, Route } from 'playwright';
+import type { Browser, BrowserContext, chromium as Chromium, Page, Route } from 'playwright';
 import { env } from '../lib/env.js';
 import { logger } from '../lib/logger.js';
 import { ScrapeError } from './errors.js';
@@ -47,7 +47,7 @@ export async function getBrowserContext(opts: BrowserOptions = {}): Promise<Brow
   if (shared && optionsMatch(shared.opts, opts)) return shared.context;
   if (shared) await closeBrowser();
 
-  let chromium: typeof import('playwright').chromium;
+  let chromium: typeof Chromium;
   try {
     ({ chromium } = await import('playwright'));
   } catch (err) {
@@ -253,7 +253,7 @@ export async function revealPrice(
         // renders at 45% opacity while it is still deciding.
         const main = el.querySelector('.price-main');
         if (!main) return false;
-        const text = (main.textContent ?? '').replace(/[​-‍﻿]/g, '');
+        const text = (main.textContent ?? '').replace(/[\u200B-\u200D\uFEFF]/g, '');
         if (/updating/i.test(text)) return false;
         return /[0-9０-９]{2,}/.test(text);
       },

@@ -13,8 +13,8 @@ describe('parsePriceText — the store renders one price six different ways', ()
     ['euro (dots group, comma decimates)', '₹1.29.249,00', 129_249],
     ['trailing prose', '₹1,29,249/- (incl. of all taxes)', 129_249],
     ['full-width digits', '₹１,２９,２４９', 129_249],
-    ['lakh with Rs. and NBSP', 'Rs. 1,29,249.00', 129_249],
-    ['zero-width joiner between every character', '₹ ​1 ​, ​2 ​9 ​, ​2 ​4 ​9', 129_249],
+    ['lakh with Rs. and NBSP', 'Rs.\u00A01,29,249.00', 129_249],
+    ['zero-width joiner between every character', '₹\u00A0\u200B1\u00A0\u200B,\u00A0\u200B2\u00A0\u200B9\u00A0\u200B,\u00A0\u200B2\u00A0\u200B4\u00A0\u200B9', 129_249],
     ['whitespace and newlines', '\n   ₹1,29,249   \n', 129_249],
     ['small price, two decimals', '₹499.50', 499.5],
   ];

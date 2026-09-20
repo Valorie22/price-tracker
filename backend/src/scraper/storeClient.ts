@@ -274,7 +274,7 @@ export async function fetchQuote(
   const stage = (s: string, d?: Record<string, unknown>): void => hooks?.onStage?.(s, d);
 
   stage('challenge');
-  const { data: challenge, res: challengeRes } = await fetchJson<Challenge>(`${env.storeBaseUrl}/api/challenge`);
+  const { data: challenge } = await fetchJson<Challenge>(`${env.storeBaseUrl}/api/challenge`);
   if (!challenge?.salt || !challenge.wasm) {
     throw new ScrapeError('PARSE_MISS', 'Challenge response was missing salt or wasm');
   }

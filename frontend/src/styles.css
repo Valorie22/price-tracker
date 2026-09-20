@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --paper: #e9ebee;
+    --panel: #fdfdfd;
+    --ink: #131a22;
+    --rule: #c6cbd1;
+    --drop: #0f7b5a;
+    --rise: #b4442c;
+    --degraded: #8a6a1f;
+    --idle: #6b7580;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'kern' 1;
+  }
+
+  /* Figures in an instrument line up. Everywhere. */
+  .tabular,
+  table,
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* One focus treatment, visible on every surface, never removed. */
+  :focus-visible {
+    outline: 2px solid #2a6fb5;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background: #c7d6e6;
+    color: var(--ink);
+  }
+
+  /* Instrument Serif has no bold cut; browsers synthesise a poor one. */
+  .font-display {
+    font-weight: 400;
+    font-synthesis-weight: none;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-panel border border-rule;
+  }
+
+  .rule-t {
+    @apply border-t border-rule;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 border border-rule bg-panel px-3 py-1.5
+           text-base font-medium text-ink transition-colors duration-fast
+           hover:bg-hover disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-panel;
+  }
+
+  .btn-primary {
+    @apply border-ink bg-ink text-paper hover:bg-ink hover:opacity-90 disabled:hover:bg-ink;
+  }
+
+  .btn-sm {
+    @apply px-2.5 py-1 text-sm;
+  }
+
+  .field {
+    @apply w-full border border-rule bg-panel px-3 py-2 text-base text-ink
+           placeholder:text-muted focus:border-focus;
+  }
+
+  /* Small caps label. Not ALL-CAPS: the brief rules those out, and letter-spaced
+     small caps read as an instrument panel rather than as a marketing eyebrow. */
+  .label {
+    @apply text-xs font-medium text-muted;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.06em;
+  }
+
+  .skeleton {
+    @apply bg-hover;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton {
+      animation: pulse-soft 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes land {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* A new reading arriving on the chart is a state change worth marking. Once, briefly. */
+@media (prefers-reduced-motion: no-preference) {
+  .mark-landing {
+    animation: land 240ms cubic-bezier(0.2, 0.8, 0.3, 1);
+    transform-origin: center;
+  }
+}
+
+/* Scrollbars that look like part of the instrument rather than the OS. */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--paper);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c6cbd1;
+    border: 3px solid var(--paper);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #8892a0;
+  }
+}
