@@ -137,3 +137,30 @@ Both branches are now tested explicitly.
 defending against and which code path can actually produce that failure. Applied
 indiscriminately, the same rule that catches a parsing error becomes a source of silent
 data loss.
+
+### 6 · The build emitted to a path the deploy config did not point at
+
+**When:** first time the compiled output was actually run, rather than typechecked.
+**What happened:**
+
+```
+$ npm run build -w backend && node backend/dist/index.js
+Error: Cannot find module 'C:\…\backend\dist\index.js'
+$ ls backend/dist
+scripts/  src/  tests/
+```
+
+`tsconfig.json` had `rootDir: "."` and included `src`, `scripts` and `tests`, so TypeScript
+preserved that structure and emitted `dist/src/index.js`. Meanwhile `render.yaml` said
+`startCommand: node backend/dist/index.js`. Typecheck passed. The tests passed. The build
+"succeeded". The deployment would have crash-looped on boot with a module-not-found, and the
+only clue would have been a Render log.
+
+**Correction:** `tsconfig.build.json` compiles `src` alone with `rootDir: "src"`, so `dist`
+mirrors `src` and the start command resolves. `tsconfig.json` still covers scripts and tests
+for `typecheck`, which is what it is for — those run through `tsx` and `vitest` and are never
+compiled. CI now runs `npm run build` and the Render start path is the one that gets built.
+
+**Lesson that shaped the build:** "it compiles" is not "it runs". Every verification step in
+`HANDOFF.md` is an execution against a real URL, not a reading of configuration — this is the
+class of bug that only appears when you run the artifact you are about to ship.
