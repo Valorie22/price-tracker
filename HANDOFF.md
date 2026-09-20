@@ -6,6 +6,29 @@ values to copy, and the verification evidence to capture at the end.
 
 **Time: about 25 minutes**, most of it waiting for Render's first build.
 
+> ### RESUMING IN A NEW SESSION? START HERE.
+>
+> **Done and proven:** Supabase live and hardened, 1,000 products indexed, full scrape
+> pipeline run end to end against the live store (§6 has the real output). 103 tests, lint,
+> typecheck and build all green. 23 commits on `main`, nothing uncommitted, no secrets tracked.
+> `backend/.env` exists (gitignored) with the Supabase URL, the service-role key and the cron
+> secret — a new session can just use it.
+>
+> **Blocked on exactly one thing:** the GitHub repo
+> https://github.com/Valorie22/price-tracker was created and is **empty**. The push was
+> rejected because the personal access token had `repo` scope but not `workflow`, and the
+> history contains `.github/workflows/ci.yml`. A token with **both `repo` and `workflow`**
+> fixes it — nothing else is wrong.
+>
+> **Then, in order:** push → Render (§3, connector available) → Vercel (§4, connector already
+> authenticated) → set `CORS_ORIGINS` to the Vercel origin → cron-job.org (§5, manual) →
+> capture §6 evidence against the Render URL.
+>
+> **Housekeeping:** the Supabase service-role key and the GitHub token were both pasted into a
+> chat. Rotate both once submitted.
+>
+> ---
+>
 > **Status, 2026-09-20.**
 > **§2 Supabase — done and proven.** Project `ine-price-tracker`
 > (ref `mpxqbtqwmtgakzintwev`, ap-southeast-1, free tier). Schema applied, security advisor
