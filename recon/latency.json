@@ -1,0 +1,1621 @@
+[
+ {
+  "label": "challenge",
+  "ms": 287,
+  "status": 200,
+  "len": 989
+ },
+ {
+  "label": "pow",
+  "ms": 13,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5908
+ },
+ {
+  "label": "session",
+  "ms": 70,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 196,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 65,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 57,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 73,
+  "status": 200,
+  "len": 957
+ },
+ {
+  "label": "pow",
+  "ms": 6,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5161
+ },
+ {
+  "label": "session",
+  "ms": 84,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 65,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 67,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 83,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 64,
+  "status": 200,
+  "len": 1009
+ },
+ {
+  "label": "pow",
+  "ms": 1,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1121
+ },
+ {
+  "label": "session",
+  "ms": 78,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 82,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 73,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 64,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 75,
+  "status": 200,
+  "len": 1009
+ },
+ {
+  "label": "pow",
+  "ms": 1,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 406
+ },
+ {
+  "label": "session",
+  "ms": 87,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 79,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 75,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 74,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 68,
+  "status": 200,
+  "len": 1021
+ },
+ {
+  "label": "pow",
+  "ms": 0,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 263
+ },
+ {
+  "label": "session",
+  "ms": 68,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 71,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 73,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 61,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 67,
+  "status": 200,
+  "len": 957
+ },
+ {
+  "label": "pow",
+  "ms": 9,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2917
+ },
+ {
+  "label": "session",
+  "ms": 81,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 117,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 148,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 145,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 81,
+  "status": 200,
+  "len": 985
+ },
+ {
+  "label": "pow",
+  "ms": 7,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5498
+ },
+ {
+  "label": "session",
+  "ms": 92,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 64,
+  "status": 503,
+  "len": 26,
+  "body": "{\"error\":\"upstream_error\"}"
+ },
+ {
+  "label": "product",
+  "ms": 66,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 59,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 75,
+  "status": 200,
+  "len": 1005
+ },
+ {
+  "label": "pow",
+  "ms": 11,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 7396
+ },
+ {
+  "label": "session",
+  "ms": 99,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 83,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 67,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 70,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 66,
+  "status": 200,
+  "len": 977
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1533
+ },
+ {
+  "label": "session",
+  "ms": 63,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 62,
+  "status": 200,
+  "len": 288,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "trailing",
+  "variant": "triple+malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 77,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 65,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 67,
+  "status": 200,
+  "len": 961
+ },
+ {
+  "label": "pow",
+  "ms": 6,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 4597
+ },
+ {
+  "label": "session",
+  "ms": 72,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 98,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 69,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 59,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 56,
+  "status": 200,
+  "len": 989
+ },
+ {
+  "label": "pow",
+  "ms": 4,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 3628
+ },
+ {
+  "label": "session",
+  "ms": 68,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 60,
+  "status": 200,
+  "len": 264,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "unicode",
+  "variant": "malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 84,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 72,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 88,
+  "status": 200,
+  "len": 1005
+ },
+ {
+  "label": "pow",
+  "ms": 11,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5731
+ },
+ {
+  "label": "session",
+  "ms": 67,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 71,
+  "status": 200,
+  "len": 240,
+  "price": 128644,
+  "stock": 93,
+  "pending": 1,
+  "variant": "stale",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 108,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 68,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 81,
+  "status": 200,
+  "len": 1017
+ },
+ {
+  "label": "pow",
+  "ms": 15,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 9913
+ },
+ {
+  "label": "session",
+  "ms": 79,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 70,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 125,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 74,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 73,
+  "status": 200,
+  "len": 997
+ },
+ {
+  "label": "pow",
+  "ms": 7,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 6297
+ },
+ {
+  "label": "session",
+  "ms": 66,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 79,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 76,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 84,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 63,
+  "status": 200,
+  "len": 997
+ },
+ {
+  "label": "pow",
+  "ms": 4,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 3310
+ },
+ {
+  "label": "session",
+  "ms": 70,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 79,
+  "status": 200,
+  "len": 260,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "euro",
+  "variant": "malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 81,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 65,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 81,
+  "status": 200,
+  "len": 1017
+ },
+ {
+  "label": "pow",
+  "ms": 0,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 148
+ },
+ {
+  "label": "session",
+  "ms": 84,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 106,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 70,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 80,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 75,
+  "status": 200,
+  "len": 1001
+ },
+ {
+  "label": "pow",
+  "ms": 4,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2591
+ },
+ {
+  "label": "session",
+  "ms": 67,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 63,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 63,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 69,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 71,
+  "status": 200,
+  "len": 1001
+ },
+ {
+  "label": "pow",
+  "ms": 2,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1876
+ },
+ {
+  "label": "session",
+  "ms": 64,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 61,
+  "status": 200,
+  "len": 288,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "trailing",
+  "variant": "triple+malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 57,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 78,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 90,
+  "status": 200,
+  "len": 997
+ },
+ {
+  "label": "pow",
+  "ms": 11,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 8167
+ },
+ {
+  "label": "session",
+  "ms": 74,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 79,
+  "status": 200,
+  "len": 260,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "nbsp",
+  "variant": "malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 75,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 80,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 60,
+  "status": 200,
+  "len": 953
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2844
+ },
+ {
+  "label": "session",
+  "ms": 72,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 68,
+  "status": 200,
+  "len": 264,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "unicode",
+  "variant": "malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 81,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 76,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 79,
+  "status": 200,
+  "len": 993
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2939
+ },
+ {
+  "label": "session",
+  "ms": 81,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 74,
+  "status": 200,
+  "len": 240,
+  "price": 128644,
+  "stock": 93,
+  "pending": 1,
+  "variant": "stale",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 80,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 72,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 72,
+  "status": 200,
+  "len": 1009
+ },
+ {
+  "label": "pow",
+  "ms": 6,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 4658
+ },
+ {
+  "label": "session",
+  "ms": 75,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 66,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 68,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 64,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 70,
+  "status": 200,
+  "len": 985
+ },
+ {
+  "label": "pow",
+  "ms": 10,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5430
+ },
+ {
+  "label": "session",
+  "ms": 84,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 54,
+  "status": 200,
+  "len": 240,
+  "price": 128644,
+  "stock": 93,
+  "pending": 1,
+  "variant": "stale",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 56,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 66,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 58,
+  "status": 200,
+  "len": 1009
+ },
+ {
+  "label": "pow",
+  "ms": 1,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 854
+ },
+ {
+  "label": "session",
+  "ms": 79,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 81,
+  "status": 500,
+  "len": 26,
+  "body": "{\"error\":\"upstream_error\"}"
+ },
+ {
+  "label": "product",
+  "ms": 65,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 69,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 62,
+  "status": 200,
+  "len": 977
+ },
+ {
+  "label": "pow",
+  "ms": 0,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 116
+ },
+ {
+  "label": "session",
+  "ms": 80,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 65,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 100,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 78,
+  "status": 200,
+  "len": 1025
+ },
+ {
+  "label": "pow",
+  "ms": 11,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 9891
+ },
+ {
+  "label": "session",
+  "ms": 78,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 68,
+  "status": 429,
+  "len": 57,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"general\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 82,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 65,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 96,
+  "status": 200,
+  "len": 997
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2650
+ },
+ {
+  "label": "session",
+  "ms": 70,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 68,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 66,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 64,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 66,
+  "status": 200,
+  "len": 1021
+ },
+ {
+  "label": "pow",
+  "ms": 6,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 5177
+ },
+ {
+  "label": "session",
+  "ms": 72,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 60,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 59,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 74,
+  "status": 200,
+  "len": 1033
+ },
+ {
+  "label": "pow",
+  "ms": 1,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1318
+ },
+ {
+  "label": "session",
+  "ms": 82,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 76,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 56,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 80,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 75,
+  "status": 200,
+  "len": 1033
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2294
+ },
+ {
+  "label": "session",
+  "ms": 75,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 71,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 57,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 77,
+  "status": 200,
+  "len": 989
+ },
+ {
+  "label": "pow",
+  "ms": 2,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1451
+ },
+ {
+  "label": "session",
+  "ms": 102,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 64,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 58,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 59,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 65,
+  "status": 200,
+  "len": 989
+ },
+ {
+  "label": "pow",
+  "ms": 4,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2803
+ },
+ {
+  "label": "session",
+  "ms": 79,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 77,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 72,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 68,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 63,
+  "status": 200,
+  "len": 989
+ },
+ {
+  "label": "pow",
+  "ms": 5,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 3798
+ },
+ {
+  "label": "session",
+  "ms": 74,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":2}"
+ },
+ {
+  "label": "product",
+  "ms": 65,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 71,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 75,
+  "status": 200,
+  "len": 1021
+ },
+ {
+  "label": "pow",
+  "ms": 2,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1282
+ },
+ {
+  "label": "session",
+  "ms": 64,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 68,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 65,
+  "status": 200,
+  "len": 350,
+  "rev": 627000,
+  "variant": 4,
+  "carrier": "text",
+  "tag": "span"
+ },
+ {
+  "label": "challenge",
+  "ms": 64,
+  "status": 200,
+  "len": 1037
+ },
+ {
+  "label": "pow",
+  "ms": 9,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 8193
+ },
+ {
+  "label": "session",
+  "ms": 74,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 122,
+  "status": 200,
+  "len": 260,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "fmt": "nbsp",
+  "variant": "malformed",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 86,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 65,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 82,
+  "status": 200,
+  "len": 1017
+ },
+ {
+  "label": "pow",
+  "ms": 2,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1617
+ },
+ {
+  "label": "session",
+  "ms": 109,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 78,
+  "status": 200,
+  "len": 240,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "clean",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 66,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "layout",
+  "ms": 86,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 96,
+  "status": 200,
+  "len": 1037
+ },
+ {
+  "label": "pow",
+  "ms": 1,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 1373
+ },
+ {
+  "label": "session",
+  "ms": 73,
+  "status": 200,
+  "len": 188
+ },
+ {
+  "label": "price",
+  "ms": 70,
+  "status": 200,
+  "len": 256,
+  "price": 165813,
+  "stock": 93,
+  "pending": 0,
+  "variant": "triple",
+  "currency": "INR"
+ },
+ {
+  "label": "product",
+  "ms": 70,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 64,
+  "status": 429,
+  "len": 57
+ },
+ {
+  "label": "challenge",
+  "ms": 76,
+  "status": 200,
+  "len": 1009
+ },
+ {
+  "label": "pow",
+  "ms": 3,
+  "status": 200,
+  "difficulty": 3,
+  "nonce": 2617
+ },
+ {
+  "label": "session",
+  "ms": 86,
+  "status": 429,
+  "len": 54,
+  "body": "{\"error\":\"rate_limited\",\"scope\":\"gate\",\"retryAfter\":1}"
+ },
+ {
+  "label": "product",
+  "ms": 78,
+  "status": 200,
+  "len": 2459
+ },
+ {
+  "label": "layout",
+  "ms": 88,
+  "status": 429,
+  "len": 57
+ }
+]

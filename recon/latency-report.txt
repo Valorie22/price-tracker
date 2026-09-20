@@ -1,0 +1,16 @@
+
+label      n   ok  p50    p95    max    statuses
+challenge   38   38     74     96    287   {"200":38}
+pow         38   38      4     13     15   {"200":38}
+session     38   32     75    102    109   {"200":32,"429":6}
+price       32   29     74    122    196   {"200":29,"429":1,"500":1,"503":1}
+product     38   28     70    125    148   {"200":28,"429":10}
+layout      38   22     69    100    145   {"200":22,"429":16}
+
+prices seen: 165813, 165813, 165813, 165813, 165813, 165813, 165813, 165813, 165813, 165813, 128644, 165813, 165813, 165813, 165813, 165813, 165813, 165813, 165813, 128644, 165813, 128644, 165813, 165813, 165813, 165813, 165813, 165813, 165813
+stock seen: 93
+formats seen: , trailing, unicode, euro, nbsp
+variants seen: clean, triple, triple+malformed, malformed, stale
+pending seen: 0, 1
+layout revisions: 627000, 
+layout variants: 4, 
