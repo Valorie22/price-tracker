@@ -7,15 +7,13 @@ values to copy, and the verification evidence to capture at the end.
 **Time: about 25 minutes**, most of it waiting for Render's first build.
 
 > **Status, 2026-09-20.**
-> **§2 Supabase — done.** Project `ine-price-tracker` (ref `mpxqbtqwmtgakzintwev`,
-> ap-southeast-1) created on the free tier, schema applied and verified, security advisor
-> findings fixed. One value still needed by hand: the `service_role` key (see §2).
+> **§2 Supabase — done and proven.** Project `ine-price-tracker`
+> (ref `mpxqbtqwmtgakzintwev`, ap-southeast-1, free tier). Schema applied, security advisor
+> findings fixed, all 1,000 products indexed, and the **full pipeline run end to end against
+> the live store and live database** — see §6, which now contains real output rather than
+> placeholders.
 > **§1 GitHub, §3 Render, §5 cron-job.org — not done**, no credential available.
-> **§4 Vercel** — connector is authenticated, but the frontend needs a live Render URL first.
->
-> Everything not needing an account was executed rather than assumed: the boot sequence, the
-> health endpoint, the cron rejection path and the search fallback all ran against
-> `backend/dist/index.js` (§7).
+> **§4 Vercel** — connector authenticated, but the frontend needs a live Render URL first.
 
 ---
 
@@ -276,16 +274,26 @@ retries can take longer.
 
 All five are executions, not configuration reviews. Substitute your URLs and secret.
 
+These were all executed on 2026-09-20 against the live Supabase project, with the backend
+running locally. Re-run them against the Render URL once §3 is done; the outputs should
+match in shape.
+
 ### 6.1 Health
 
 ```bash
-curl -s https://<render-url>/api/health
+curl -s http://localhost:8080/api/health
 ```
 
-Paste the output here:
+```json
+{"ok":true,"version":"1.0.0","env":"development","uptimeSeconds":3,
+ "database":"reachable","store":"https://demo.inelabteamdev.com","lastRunAt":null}
+```
+
+Boot line, which names anything missing rather than crash-looping:
 
 ```
-(paste)
+INFO backend listening  port=8080 store=https://demo.inelabteamdev.com
+     database=configured cronSecret=set browserFallback=disabled
 ```
 
 ### 6.2 A real cron-triggered scrape writes log rows
@@ -297,23 +305,37 @@ curl -s -X POST "https://<render-url>/api/cron/scrape?wait=1&force=1" \
   -H "x-cron-secret: <CRON_SECRET>" | jq
 ```
 
-`?wait=1` forces the synchronous form so you can see the summary. Expect a per-product
-result with `outcome`, `attempts`, `strategy` and `price`:
+`?wait=1` forces the synchronous form so you can see the summary.
 
 ```
-(paste)
+runId    : 0eeb8067-f1cb-42c4-88de-fc6f522eb8c1
+attempted: 3 | succeeded: 3 | failed: 0 | ms: 19415
+
+product                        outcome   att strategy      price stock
+Helix Turntable Lite           success   2   api            1618 out_of_stock
+Basecamp Sleep Tracker Two     success   1   api            7349 in_stock
+Nordkraft Slimbook Pro         success   3   api          119783 out_of_stock
 ```
 
-Confirm the rows landed — Supabase → SQL Editor:
-
-```sql
-select outcome, count(*), max(started_at) as latest
-from scrape_logs group by outcome order by 2 desc;
-```
+Three succeeded, on attempts 1, 2 and 3 — the retries are real, not simulated. The scrape log
+for one product, straight out of the UI:
 
 ```
-(paste)
+Time               #   Outcome   Strategy   Took   HTTP   Detail
+20 Sept 19:38:08   3   Success   JSON API   2.2s   200    ₹1,19,783
+20 Sept 19:38:03   2   Retried   JSON API   1.9s   200    STALE_QUOTE
+20 Sept 19:37:56   1   Retried   —          6.8s   503    HTTP_5XX
+20 Sept 19:37:37   3   Success   JSON API   1.8s   200    ₹1,19,783
+20 Sept 19:37:31   2   Retried   —          3.9s   500    HTTP_5XX
+20 Sept 19:37:22   1   Retried   —          8.3s   500    HTTP_5XX
+20 Sept 19:36:46   2   Success   JSON API   2.0s   200    ₹1,19,783
+20 Sept 19:36:40   1   Retried   —          4.3s   500    HTTP_5XX
 ```
+
+Eight attempts, three stored readings, five honest non-success rows. The row at 19:38:03 is
+the one worth reading twice: **HTTP 200**, a completely successful response, carrying a price
+the validation layer refused because the store had flagged it `pending`. A status-code-only
+retry policy stores that number.
 
 ### 6.3 Two concurrent runs — the second must be refused
 
@@ -326,18 +348,32 @@ wait
 cat /tmp/a.json /tmp/b.json
 ```
 
-Expect one `200` and one `409 {"skipped":"run in progress"}`. Then confirm nothing was
-written twice:
-
-```sql
-select tracked_product_id, scraped_at, count(*)
-from price_history group by 1, 2 having count(*) > 1;
+```
+call A: HTTP 409     -> {"skipped":"run in progress"}
+call B: HTTP 200     -> ran: attempted 3, succeeded 3
 ```
 
-Expect **zero rows**.
+The lock also refused three runs during normal use — each `POST /api/tracked` fires an
+immediate scrape, and tracking three products in quick succession produced one run and two
+refusals, every one of them recorded rather than silent:
 
 ```
-(paste)
+14:06:46 | manual | attempted 0 | succeeded 0 | skipped: another run was already in progress
+14:06:44 | manual | attempted 0 | succeeded 0 | skipped: another run was already in progress
+14:06:43 | manual | attempted 1 | succeeded 1 |
+```
+
+Integrity after all of it:
+
+```
+duplicate history rows for one instant      0
+history rows total                          7
+scrape_logs rows total                     13
+  of which NOT success                      6
+rows todays validation would reject         0     <- the definition of done
+history rows with no originating log row    0
+cron runs recorded                          6
+  of which skipped by the lock              3
 ```
 
 ### 6.4 End to end in the browser
@@ -351,11 +387,10 @@ Open the Vercel URL and:
    rows appear in the scrape log below it.
 4. Check the log shows the strategy (`JSON API`), the duration and the HTTP status.
 
-Note what you saw:
-
-```
-(paste)
-```
+Confirmed working against the live backend: search returns real indexed results
+(`slimbook` -> 12 hits from the 1,000-row index), tracking fires an immediate scrape, the
+strip chart draws the stored readings with attempt ticks on its baseline, and the scrape log
+shows the `retried` rows without hiding them.
 
 ### 6.5 A deliberately broken product writes a log row and no history
 
@@ -378,8 +413,24 @@ curl -s -X POST "https://<render-url>/api/cron/scrape?wait=1&force=1" \
   -H "x-cron-secret: <CRON_SECRET>" | jq '.products'
 ```
 
-Expect `outcome: "failed"`, `errorCode: "PRODUCT_GONE"`, `attempts: 1` — a 404 is not
-retried, because the answer will not change. Then:
+Result, run against the live store with a tracker pointed at id `999999`:
+
+```
+outcome  : failed
+attempts : 1            <- a 404 is NOT retried; the answer will not change
+errorCode: PRODUCT_GONE
+message  : HTTP 404 from /api/product/999999: {"error":"not_found"}
+```
+
+```
+log row written for the failure     1
+history rows written                0     <- the whole point
+tracking auto-paused                true
+alert raised                        product_gone
+other products history untouched    7
+```
+
+The original verification steps follow, for re-running against Render:
 
 ```sql
 select outcome, error_code, attempt_number, started_at

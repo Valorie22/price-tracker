@@ -5,16 +5,17 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --env-file-if-exists=.env src/index.ts",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/index.js",
+    "start": "node --env-file-if-exists=.env dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src tests scripts --ext .ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "scrape:headed": "tsx scripts/headed-run.ts",
-    "seed:catalog": "tsx scripts/seed-catalog.ts",
-    "db:apply": "tsx scripts/apply-schema.ts"
+    "scrape:headed": "tsx --env-file-if-exists=.env scripts/headed-run.ts",
+    "seed:catalog": "tsx --env-file-if-exists=.env scripts/seed-catalog.ts",
+    "db:apply": "tsx --env-file-if-exists=.env scripts/apply-schema.ts",
+    "smoke": "tsx --env-file-if-exists=.env scripts/smoke.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
