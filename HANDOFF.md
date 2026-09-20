@@ -25,8 +25,11 @@ values to copy, and the verification evidence to capture at the end.
 > §6 re-run against the live Render URL — the real output is inline below, replacing the
 > local-run placeholders.
 >
-> **One thing left that needs a login:** the two cron-job.org jobs in §5. Field values are
-> there; the secret is in `secrets/CREDENTIALS.md` (gitignored), never in this file.
+> **cron-job.org — done.** Both jobs created through their REST API (§5). Two real
+> cron-triggered runs are on the record at 15:15:44 and 15:31:11 UTC, so `BUILD_SPEC.md` §11's
+> definition of done is met in full: two unattended cron runs, genuine non-success rows the
+> UI shows without hiding them, and zero rows in `price_history` that today's validation
+> would reject.
 >
 > **Then:** record the clip per `RECORDING.md`, paste its link into §8 and
 > `SUBMISSION_EMAIL.md`, attach the resume, send.
@@ -631,13 +634,62 @@ overflow at any width, no unlabelled controls, every hit target at least 24 px.
 | API | https://ine-price-tracker-api-oorv.onrender.com |
 | Repository | https://github.com/Valorie22/price-tracker |
 | Recording | `https://…` *(record per RECORDING.md, then paste here and in SUBMISSION_EMAIL.md)* |
-| First cron run at | *(fill from cron-job.org once job 1 has fired)* |
-| Second cron run at | *(fill from cron-job.org once job 1 has fired twice)* |
+| First cron run at | **15:15:44 UTC** — HTTP 202 ack in 3.0 s; run `15:15:46 → 15:16:19`, 3/3 |
+| Second cron run at | **15:31:11 UTC** — HTTP 202 ack in 3.3 s; run `15:31:13 → 15:31:22`, 3/3 |
 
 Dashboards: [Render](https://dashboard.render.com/web/srv-danv6nek1f9s73a37cdg) ·
 [Vercel](https://vercel.com/valories-projects-20c9e1bb/ine-price-tracker) ·
 [Supabase](https://supabase.com/dashboard/project/mpxqbtqwmtgakzintwev) ·
 [Actions](https://github.com/Valorie22/price-tracker/actions)
+
+### The two cron-triggered runs, and how they were obtained
+
+Both were fired by cron-job.org, not by hand — the timestamps above come from the job's own
+execution history, and the runs they produced are in `cron_runs` with `trigger_source='cron'`.
+cron-job.org fires 45–70 s after the nominal minute, which is why they read `:15:44` and
+`:31:11` rather than `:15:00` and `:30:00`; the keepalive job shows the same offset.
+
+**The scrape job was temporarily moved to `*/15` and the per-product intervals to 10 minutes
+so both runs would land before the submission deadline** rather than at 16:00 and 18:00 UTC.
+Both were restored immediately afterwards — the job is back on `0 */2 * * *` (next 16:00 UTC)
+and every product back to 120 minutes. This is recorded so the acceleration is not mistaken
+for the shipped configuration.
+
+The first run is the one worth reading. It was not an easy three-for-three:
+
+```
+15:15:46  Basecamp   att 1  retried  200  STALE_QUOTE
+15:15:46  Nordkraft  att 1  retried  503  HTTP_5XX
+15:15:46  Helix      att 1  success  200
+15:15:54  Basecamp   att 2  retried  500  HTTP_5XX
+15:15:57  Nordkraft  att 2  retried  500  HTTP_5XX
+15:16:03  Basecamp   att 3  success  200     <- recovered
+15:16:05  Nordkraft  att 3  retried  429  HTTP_429
+15:16:18  Nordkraft  att 4  success  200     <- recovered
+```
+
+Eight attempts, five honest `retried` rows, three readings stored — unattended, with nothing
+simulated. That is the assignment's core claim demonstrated by the schedule itself.
+
+**Database state after everything above:**
+
+```
+history rows total                          21
+scrape_logs total                           41
+  success                                   21
+  retried                                   17
+  failed                                     3
+rows todays validation would reject          0   <- definition of done
+history rows with no originating log row     0
+duplicate history rows for one instant       0
+unfinished cron runs                         0
+cron_runs total                             15
+  skipped by the overlap lock                4
+alerts raised                                4
+```
+
+Twenty-one readings out of forty-one attempts. The other twenty produced nothing, and every
+one of them is on the record.
 
 The definition of done in `BUILD_SPEC.md` §11: two real cron-triggered runs in production, at
 least one genuine non-success row in the scrape log that the UI displays without hiding it,
