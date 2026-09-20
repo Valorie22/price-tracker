@@ -12,7 +12,8 @@ values to copy, and the verification evidence to capture at the end.
 >
 > | | |
 > |---|---|
-> | Live app | https://ine-price-tracker-eight.vercel.app |
+> | Live app | https://ine-price-tracker-app.vercel.app |
+> | *(also resolves)* | https://ine-price-tracker-eight.vercel.app — Vercel's original auto-assigned domain |
 > | API | https://ine-price-tracker-api-oorv.onrender.com |
 > | Repository | https://github.com/Valorie22/price-tracker (public) |
 > | Supabase | `mpxqbtqwmtgakzintwev`, ap-southeast-1 |
@@ -248,6 +249,19 @@ curl -s -X POST "https://api.render.com/v1/services/<service-id>/deploys" \
 ---
 
 ## 5 · cron-job.org — the schedule
+
+> **Done — both jobs exist and are enabled.** Created through the cron-job.org REST API on
+> 2026-09-20, not by hand, so the secret was never retyped:
+>
+> | Job | id | Method | Schedule (UTC) | Timeout | Notify on failure |
+> |---|---|---|---|---|---|
+> | `INE tracker — scrape` | `8478539` | POST | `0 */2 * * *` | 30 s | on |
+> | `INE tracker — keepalive` | `8478540` | GET | `*/10 * * * *` | 10 s | off |
+>
+> The scrape job carries `x-cron-secret` in `extendedData.headers`, read straight from
+> `backend/.env`. Dashboard: [console.cron-job.org](https://console.cron-job.org/jobs).
+>
+> The tables below are the manual equivalent, kept for anyone rebuilding this by hand.
 
 Two jobs. The first is the scrape; the second keeps Render awake so the first does not spend
 a fifth of its budget on a cold start.
@@ -613,7 +627,7 @@ overflow at any width, no unlabelled controls, every hit target at least 24 px.
 
 | | |
 |---|---|
-| Live app | https://ine-price-tracker-eight.vercel.app |
+| Live app | https://ine-price-tracker-app.vercel.app |
 | API | https://ine-price-tracker-api-oorv.onrender.com |
 | Repository | https://github.com/Valorie22/price-tracker |
 | Recording | `https://…` *(record per RECORDING.md, then paste here and in SUBMISSION_EMAIL.md)* |
